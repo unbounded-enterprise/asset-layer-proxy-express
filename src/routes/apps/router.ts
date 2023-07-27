@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { getApp, getAppSlots } from './handlers';
+import { getApp, getAppSlots, getApps } from './handlers';
 
 const appsRouter: Router = Router();
 
 appsRouter.get('/info', getApp);
+appsRouter.get('/infos', getApps);
 appsRouter.get('/slots', getAppSlots);
 // appRouter.get('/listings', appsHandler.getAppsWithListings);
 // appRouter.get('/secret', appsHandler.getAppSecret);

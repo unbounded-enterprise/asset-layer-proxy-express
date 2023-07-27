@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "dotenv": "^16.3.1",
-    "dubby-sdk-test": "^0.0.27",
+    "dubby-sdk-test": "^0.0.31",
     "express": "^4.18.2"
   },
   "devDependencies": {

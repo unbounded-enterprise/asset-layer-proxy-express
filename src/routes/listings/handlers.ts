@@ -1,6 +1,7 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
+import { CreateListingProps, GetAppListingsProps, GetCollectionListingsProps, GetUserListingsProps, UpdateListingProps } from "dubby-sdk-test/dist/types/listing";
 
 type GetListingProps = { listingId: string; };
 type GetListingRequest = Request<{},{},GetListingProps,GetListingProps>;
@@ -17,23 +18,20 @@ export const getListing = async (req: GetListingRequest, res: CustomResponse, ne
   }
 }
 
-/*
 type GetUserListingsRequest = Request<{},{},GetUserListingsProps,GetUserListingsProps>;
 export const getUserListings = async (req: GetUserListingsRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const { handle, sellerOnly, buyerOnly, status, collectionId, countsOnly } = { ...req.body, ...req.query };
 
-    const listings = await assetlayer.listings.getUserListings(listingId);
+    const listings = await assetlayer.listings.getUserListings({ handle, sellerOnly, buyerOnly, status, collectionId, countsOnly });
 
-    return res.json(listing);
+    return res.json(listings);
   }
   catch (e) {
     return next(e);
   }
 }
-*/
 
-/*
 type GetCollectionListingsRequest = Request<{},{},GetCollectionListingsProps,GetCollectionListingsProps>;
 export const getCollectionListings = async (req: GetCollectionListingsRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -41,15 +39,13 @@ export const getCollectionListings = async (req: GetCollectionListingsRequest, r
 
     const listings = await assetlayer.listings.getCollectionListings({ collectionId, collectionIds, status, lastUpdatedAt, countsOnly, collectionStats });
 
-    return res.json(listing);
+    return res.json(listings);
   }
   catch (e) {
     return next(e);
   }
 }
-*/
 
-/*
 type GetAppListingsRequest = Request<{},{},GetAppListingsProps,GetAppListingsProps>;
 export const getAppListings = async (req: GetAppListingsRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -57,21 +53,19 @@ export const getAppListings = async (req: GetAppListingsRequest, res: CustomResp
 
     const listings = await assetlayer.listings.getAppListings({ appId, status, lastUpdatedAt, countsOnly, collectionStats });
 
-    return res.json(listing);
+    return res.json(listings);
   }
   catch (e) {
     return next(e);
   }
 }
-*/
 
-/*
 type CreateListingRequest = Request<{},{},CreateListingProps,CreateListingProps>;
 export const createListing = async (req: CreateListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const { handle, price, nftId, nftIds, collectionId, liveTime, status } = { ...req.body, ...req.query };
 
-    const success = null; // await assetlayer.listings.createListing({ handle, price, nftId, nftIds, collectionId, liveTime, status });
+    const success = await assetlayer.listings.createListing({ handle, price, nftId, nftIds, collectionId, liveTime, status });
 
     return res.json(success);
   }
@@ -79,7 +73,6 @@ export const createListing = async (req: CreateListingRequest, res: CustomRespon
     return next(e);
   }
 }
-*/
 
 type BuyListingProps = { listingId: string; handle: string; price?: number; };
 type BuyListingRequest = Request<{},{},BuyListingProps,BuyListingProps>;
@@ -87,7 +80,7 @@ export const buyListing = async (req: BuyListingRequest, res: CustomResponse, ne
   try {
     const { listingId, handle, price } = { ...req.body, ...req.query };
 
-    const success = null; // await assetlayer.listings.buyListing(listingId, handle, price);
+    const success = await assetlayer.listings.buyListing(listingId, handle, price);
 
     return res.json(success);
   }
@@ -96,7 +89,6 @@ export const buyListing = async (req: BuyListingRequest, res: CustomResponse, ne
   }
 }
 
-/*
 type UpdateListingRequest = Request<{},{},UpdateListingProps,UpdateListingProps>;
 export const updateListing = async (req: UpdateListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -110,7 +102,6 @@ export const updateListing = async (req: UpdateListingRequest, res: CustomRespon
     return next(e);
   }
 }
-*/
 
 type RemoveListingProps = { listingId: string; handle: string; };
 type RemoveListingRequest = Request<{},{},RemoveListingProps,RemoveListingProps>;
@@ -118,7 +109,7 @@ export const removeListing = async (req: RemoveListingRequest, res: CustomRespon
   try {
     const { listingId, handle } = { ...req.body, ...req.query };
 
-    const success = null; // await assetlayer.listings.removeListing(listingId, handle);
+    const success = await assetlayer.listings.removeListing(listingId, handle);
 
     return res.json(success);
   }

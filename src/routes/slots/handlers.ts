@@ -23,7 +23,7 @@ export const getSlotCollections = async (req: GetSlotCollectionsRequest, res: Cu
   try {
     const { slotId, idOnly, includeDeactivated } = { ...req.body, ...req.query };
 
-    const slot = null; // await assetlayer.slots.getSlotCollections(slotId, idOnly, includeDeactivated);
+    const slot = await assetlayer.slots.getSlotCollections(slotId, idOnly, includeDeactivated);
 
     return res.json(slot);
   }
