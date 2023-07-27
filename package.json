@@ -1,6 +1,7 @@
 {
   "main": "src/index.ts",
   "scripts": {
+    "start": "npx ts-node ./src/index.ts",
     "dev": "npx ts-node ./src/index.ts",
     "create-env": "node ./src/utils/env-setup.js"
   },
