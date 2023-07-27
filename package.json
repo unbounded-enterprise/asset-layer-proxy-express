@@ -1,11 +1,16 @@
 {
+  "main": "src/index.ts",
   "scripts": {
-    "dev": "node index.js",
-    "create-env": "node ./utils/env-setup.js"
+    "dev": "npx ts-node ./src/index.ts",
+    "create-env": "node ./src/utils/env-setup.js"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
-    "dubby-sdk-test": "^0.0.26",
+    "dubby-sdk-test": "^0.0.27",
     "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.4.5"
   }
 }
