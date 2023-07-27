@@ -11,7 +11,7 @@ import slotsRouter from './routes/slots/router';
 import usersRouter from './routes/users/router';
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 const apiRoute = '/api';
 let server: Server;
 
