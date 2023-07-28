@@ -1,5 +1,19 @@
 {
+  "name": "asset-layer-proxy-express",
+  "version": "0.0.01",
   "main": "src/index.ts",
+  "description": "",
+  "keywords": [],
+  "author": "Asset Layer",
+  "license": "MIT",
+  "homepage": "https://github.com/unbounded-enterprise/asset-layer-proxy-express#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unbounded-enterprise/asset-layer-proxy-express.git"
+  },
+  "bugs": {
+    "url": "https://github.com/unbounded-enterprise/asset-layer-proxy-express/issues"
+  },
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
@@ -8,10 +22,12 @@
     "heroku-postbuild": "npm run build"
   },
   "dependencies": {
-    "@types/express": "^4.17.17",
-    "@types/node": "^20.4.5",
     "dotenv": "^16.3.1",
     "dubby-sdk-test": "^0.0.31",
     "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.4.5"
   }
 }
