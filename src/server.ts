@@ -10,7 +10,7 @@ import expressionsRouter from './routes/expressions/router';
 import listingsRouter from './routes/listings/router';
 import slotsRouter from './routes/slots/router';
 import usersRouter from './routes/users/router';
-import { parseBasicError } from "@assetlayer/sdk/dist/resources/apps";
+import { parseBasicError } from './utils/basic-error';
 
 const validErrorStatusCodes = new Set([400,401,404,406,407,409]);
 const app = express();

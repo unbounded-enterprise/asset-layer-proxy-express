@@ -1,6 +1,8 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
+import { GetAppSlotsProps } from "@assetlayer/sdk/dist/types/app";
+import { parseBasicError } from "../../utils/basic-error";
 
 type GetAppProps = { appId?: string; appIds?: string[]; };
 type GetAppRequest = Request<{},{},GetAppProps,GetAppProps>;
@@ -18,6 +20,8 @@ export const getApp = async (req: GetAppRequest, res: CustomResponse, next: Next
     return res.json(app);
   }
   catch (e) {
+    const error = parseBasicError(e);
+    console.log('[AssetLayer/Apps]:', error.message);
     return next(e);
   }
 }
@@ -37,7 +41,6 @@ export const getApps = async (req: GetAppRequest, res: CustomResponse, next: Nex
   }
 }
 
-type GetAppSlotsProps = { appId: string; idOnly?: boolean; };
 type GetAppSlotsRequest = Request<{},{},GetAppSlotsProps,GetAppSlotsProps>;
 export const getAppSlots = async (req: GetAppSlotsRequest, res: CustomResponse, next: NextFunction) => {
   try {
