@@ -11,7 +11,7 @@ export const getApp = async (req: GetAppRequest, res: CustomResponse, next: Next
     if (appIds) return await getApps(req, res, next);
     else if (!appId) throw new Error('Missing appId');
 
-    const app = await assetlayer.apps.getApp(appId);
+    const app = await assetlayer.apps.getApp({ appId });
 
     console.log('app', app);
 
@@ -28,7 +28,7 @@ export const getApps = async (req: GetAppRequest, res: CustomResponse, next: Nex
 
     if (appId) appIds.push(appId);
 
-    const app = await assetlayer.apps.getApps(appIds);
+    const app = await assetlayer.apps.getApps({ appIds });
 
     return res.json(app);
   }
@@ -41,9 +41,7 @@ type GetAppSlotsProps = { appId: string; idOnly?: boolean; };
 type GetAppSlotsRequest = Request<{},{},GetAppSlotsProps,GetAppSlotsProps>;
 export const getAppSlots = async (req: GetAppSlotsRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { appId, idOnly } = { ...req.body, ...req.query };
-
-    const slots = null; // await assetlayer.apps.getAppSlots(appId, idOnly);
+    const slots = await assetlayer.apps.getAppSlots({ ...req.body, ...req.query });
 
     return res.json(slots);
   }
