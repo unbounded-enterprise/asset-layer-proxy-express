@@ -1,7 +1,7 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { CreateExpressionProps, UpdateAssetExpressionValuesProps, UpdateAssetsExpressionValuesProps, UpdateBulkExpressionValuesProps, UpdateCollectionExpressionValuesProps, UpdateExpressionProps } from "dubby-sdk-test/dist/types/expression";
+import { CreateExpressionProps, UpdateAssetExpressionValuesProps, UpdateAssetsExpressionValuesProps, UpdateBulkExpressionValuesProps, UpdateCollectionExpressionValuesProps, UpdateExpressionProps } from "@assetlayer/sdk/dist/types/expression";
 
 export const getExpressionTypes = async (req: Request, res: CustomResponse, next: NextFunction) => {
   try {

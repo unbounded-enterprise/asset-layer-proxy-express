@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import { Server } from 'http';
-import { AssetLayer } from 'dubby-sdk-test';
+import { AssetLayer } from '@assetlayer/sdk';
 import appsRouter from './routes/apps/router';
 import assetsRouter from './routes/assets/router';
 import collectionsRouter from './routes/collections/router';

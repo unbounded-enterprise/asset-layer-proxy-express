@@ -1,7 +1,7 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, UpdateAssetProps } from "dubby-sdk-test/dist/types/asset";
+import { GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, UpdateAssetProps } from "@assetlayer/sdk/dist/types/asset";
 
 type GetAssetProps = { assetId?: string; assetIds?: string[]; };
 type GetAssetRequest = Request<{},{},GetAssetProps,GetAssetProps>;

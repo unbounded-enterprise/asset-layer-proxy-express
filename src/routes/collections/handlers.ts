@@ -1,7 +1,7 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { CreateCollectionProps, UpdateCollectionProps } from "dubby-sdk-test/dist/types/collection";
+import { CreateCollectionProps, UpdateCollectionProps } from "@assetlayer/sdk/dist/types/collection";
 
 type GetCollectionProps = { collectionId?: string; collectionIds?: string[]; };
 type GetCollectionRequest = Request<{},{},GetCollectionProps,GetCollectionProps>;

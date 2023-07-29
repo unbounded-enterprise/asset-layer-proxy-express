@@ -1,7 +1,7 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { CreateListingProps, GetAppListingsProps, GetCollectionListingsProps, GetUserListingsProps, UpdateListingProps } from "dubby-sdk-test/dist/types/listing";
+import { CreateListingProps, GetAppListingsProps, GetCollectionListingsProps, GetUserListingsProps, UpdateListingProps } from "@assetlayer/sdk/dist/types/listing";
 
 type GetListingProps = { listingId: string; };
 type GetListingRequest = Request<{},{},GetListingProps,GetListingProps>;
