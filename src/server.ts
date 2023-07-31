@@ -30,7 +30,7 @@ function init() {
 function errorHandler(e: unknown, req: Request, res: Response, next: NextFunction) {
   const error = parseBasicError(e);
 
-  if (validErrorStatusCodes.has(error.status)) return res.status(400).send(error.message);
+  if (validErrorStatusCodes.has(error.status)) return res.status(error.status).send(error.message);
   else return res.status(500).send();
 }
 
