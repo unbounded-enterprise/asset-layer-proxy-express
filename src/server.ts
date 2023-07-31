@@ -27,6 +27,12 @@ function init() {
   server.keepAliveTimeout = 61 * 1000;
   server.headersTimeout = 65 * 1000;
 }
+function errorHandler(e: unknown, req: Request, res: Response, next: NextFunction) {
+  const error = parseBasicError(e);
+
+  if (validErrorStatusCodes.has(error.status)) return res.status(400).send(error.message);
+  else return res.status(500).send();
+}
 
 app.use(`${apiRoute}/app`, appsRouter);
 app.use(`${apiRoute}/asset`, assetsRouter);
@@ -41,14 +47,7 @@ app.use(`${apiRoute}/slot`, slotsRouter);
 // app.use(`${apiRoute}/team`, teamRouter);
 app.use(`${apiRoute}/user`, usersRouter);
 
-app.use((e: unknown, req: Request, res: Response, next: NextFunction) => {
-  const error = parseBasicError(e);
-
-  console.log(`[AssetLayer(${error.status})]: ${error.message}`);
-
-  if (validErrorStatusCodes.has(error.status)) return res.status(400).send(error.message);
-  else return res.status(500).send();
-});
+app.use(errorHandler);
 
 /*
 const close = () => (

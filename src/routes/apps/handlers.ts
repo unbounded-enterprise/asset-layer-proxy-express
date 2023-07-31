@@ -15,13 +15,9 @@ export const getApp = async (req: GetAppRequest, res: CustomResponse, next: Next
 
     const app = await assetlayer.apps.getApp({ appId });
 
-    console.log('app', app);
-
     return res.json(app);
   }
   catch (e) {
-    const error = parseBasicError(e);
-    console.log('[AssetLayer/Apps]:', error.message);
     return next(e);
   }
 }
