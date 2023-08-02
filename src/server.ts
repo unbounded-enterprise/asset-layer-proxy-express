@@ -8,6 +8,7 @@ import collectionsRouter from './routes/collections/router';
 import equipsRouter from './routes/equips/router';
 import expressionsRouter from './routes/expressions/router';
 import listingsRouter from './routes/listings/router';
+// import magicRouter from './routes/magic/router';
 import slotsRouter from './routes/slots/router';
 import usersRouter from './routes/users/router';
 import { parseBasicError } from './utils/basic-error';
@@ -41,11 +42,20 @@ app.use(`${apiRoute}/equip`, equipsRouter);
 app.use(`${apiRoute}/expression`, expressionsRouter);
 // app.use(`${apiRoute}/handcash`, handcashRouter);
 app.use(`${apiRoute}/listing`, listingsRouter);
+// app.use(`${apiRoute}/magic`, magicRouter);
 // app.use(`${apiRoute}/permission`, permissionRouter);
 app.use(`${apiRoute}/slot`, slotsRouter);
 // app.use(`${apiRoute}/stripe`, stripeRouter);
 // app.use(`${apiRoute}/team`, teamRouter);
 app.use(`${apiRoute}/user`, usersRouter);
+app.use('/', async (req: any, res: any, next: NextFunction) => {
+  try {
+    return res.sendFile('did.html', { root: 'src' });
+  }
+  catch (e) {
+    return next(e);
+  }
+})
 
 app.use(errorHandler);
 

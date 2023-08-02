@@ -1,7 +1,7 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, UpdateAssetProps } from "@assetlayer/sdk/dist/types/asset";
+import { GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
 
 type GetAssetProps = { assetId?: string; assetIds?: string[]; };
 type GetAssetRequest = Request<{},{},GetAssetProps,GetAssetProps>;
@@ -12,7 +12,7 @@ export const getAsset = async (req: GetAssetRequest, res: CustomResponse, next: 
     if (assetIds) return await getAssets(req, res, next);
     else if (!assetId) throw new Error('Missing assetId');
 
-    const asset = await assetlayer.assets.getAsset(assetId);
+    const asset = await assetlayer.assets.getAsset({ nftId: assetId });
 
     return res.json(asset);
   }
@@ -27,7 +27,7 @@ export const getAssets = async (req: GetAssetRequest, res: CustomResponse, next:
 
     if (assetId) assetIds.push(assetId);
 
-    const assets = await assetlayer.assets.getAssets(assetIds);
+    const assets = await assetlayer.assets.getAssets({ nftIds: assetIds });
 
     return res.json(assets);
   }
@@ -42,7 +42,7 @@ export const getUserAssets = async (req: GetUserAssetsRequest, res: CustomRespon
   try {
     const { userId, idOnly } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.getUserAssets(userId, idOnly);
+    const assets = await assetlayer.assets.getUserAssets({ handle: userId, idOnly });
 
     return res.json(assets);
   }
@@ -113,7 +113,7 @@ export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, ne
   try {
     const { collectionId, amount, handle } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.mintAssets(collectionId, amount, handle);
+    const assets = await assetlayer.assets.mintAssets({ collectionId, amount, handle });
 
     return res.json(assets);
   }
@@ -131,7 +131,7 @@ export const sendAsset = async (req: SendAssetRequest, res: CustomResponse, next
     if (nftIds) return await sendAssets(req, res, next)
     else if (!nftId) throw new Error('Missing nftId');
 
-    const assets = await assetlayer.assets.sendAsset(recipientHandle, nftId, handle);
+    const assets = await assetlayer.assets.sendAsset({ recipientHandle, nftId, handle });
 
     return res.json(assets);
   }
@@ -146,7 +146,7 @@ export const sendAssets = async (req: SendAssetRequest, res: CustomResponse, nex
 
     if (nftId) nftIds.push(nftId);
 
-    const assets = await assetlayer.assets.sendAssets(recipientHandle, nftIds, handle);
+    const assets = await assetlayer.assets.sendAssets({ recipientHandle, nftIds, handle });
 
     return res.json(assets);
   }
@@ -161,7 +161,7 @@ export const sendCollectionAssets = async (req: SendCollectionAssetsRequest, res
   try {
     const { recipientHandle, collectionId, handle } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.sendCollectionAssets(recipientHandle, collectionId, handle);
+    const assets = await assetlayer.assets.sendCollectionAssets({ recipientHandle, collectionId, handle });
 
     return res.json(assets);
   }
@@ -175,7 +175,7 @@ export const sendLowestAsset = async (req: SendLowestAssetRequest, res: CustomRe
   try {
     const { recipientHandle, collectionId, handle } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.sendLowestAsset(recipientHandle, collectionId, handle);
+    const assets = await assetlayer.assets.sendLowestAsset({ recipientHandle, collectionId, handle });
 
     return res.json(assets);
   }
@@ -189,7 +189,7 @@ export const sendRandomAsset = async (req: SendRandomAssetRequest, res: CustomRe
   try {
     const { recipientHandle, collectionId, handle } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.sendRandomAsset(recipientHandle, collectionId, handle);
+    const assets = await assetlayer.assets.sendRandomAsset({ recipientHandle, collectionId, handle });
 
     return res.json(assets);
   }
@@ -201,9 +201,37 @@ export const sendRandomAsset = async (req: SendRandomAssetRequest, res: CustomRe
 type UpdateAssetRequest = Request<{},{},UpdateAssetProps,UpdateAssetProps>;
 export const updateAsset = async (req: UpdateAssetRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { properties, nftId, nftIds, collectionId } = { ...req.body, ...req.query };
+    const { properties, nftId } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.updateAsset({ properties, nftId, nftIds, collectionId });
+    const assets = await assetlayer.assets.updateAsset({ properties, nftId });
+
+    return res.json(assets);
+  }
+  catch (e) {
+    return next(e);
+  }
+}
+
+type UpdateAssetsRequest = Request<{},{},UpdateAssetsProps,UpdateAssetsProps>;
+export const updateAssets = async (req: UpdateAssetsRequest, res: CustomResponse, next: NextFunction) => {
+  try {
+    const { properties, nftIds } = { ...req.body, ...req.query };
+
+    const assets = await assetlayer.assets.updateAssets({ properties, nftIds } as any);
+
+    return res.json(assets);
+  }
+  catch (e) {
+    return next(e);
+  }
+}
+
+type UpdateCollectionAssetsRequest = Request<{},{},UpdateCollectionAssetsProps,UpdateCollectionAssetsProps>;
+export const updateCollectionAssets = async (req: UpdateCollectionAssetsRequest, res: CustomResponse, next: NextFunction) => {
+  try {
+    const { properties, collectionId } = { ...req.body, ...req.query };
+
+    const assets = await assetlayer.assets.updateCollectionAssets({ properties, collectionId } as any);
 
     return res.json(assets);
   }
