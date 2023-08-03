@@ -1,15 +1,14 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { CreateListingProps, GetAppListingsProps, GetCollectionListingsProps, GetUserListingsProps, UpdateListingProps } from "@assetlayer/sdk/dist/types/listing";
+import { BuyListingProps, CreateListingAllProps, GetAppListingsProps, GetCollectionListingsProps, GetListingProps, GetUserListingsProps, RemoveListingProps, UpdateListingProps } from "@assetlayer/sdk/dist/types/listing";
 
-type GetListingProps = { listingId: string; };
 type GetListingRequest = Request<{},{},GetListingProps,GetListingProps>;
 export const getListing = async (req: GetListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const listingId = req.query.listingId || req.body.listingId;
 
-    const listing = await assetlayer.listings.getListing(listingId);
+    const listing = await assetlayer.listings.getListing({ listingId });
 
     return res.json(listing);
   }
@@ -21,9 +20,9 @@ export const getListing = async (req: GetListingRequest, res: CustomResponse, ne
 type GetUserListingsRequest = Request<{},{},GetUserListingsProps,GetUserListingsProps>;
 export const getUserListings = async (req: GetUserListingsRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { handle, sellerOnly, buyerOnly, status, collectionId, countsOnly } = { ...req.body, ...req.query };
+    const { sellerOnly, buyerOnly, status, collectionId, countsOnly, walletUserId } = { ...req.body, ...req.query };
 
-    const listings = await assetlayer.listings.getUserListings({ handle, sellerOnly, buyerOnly, status, collectionId, countsOnly });
+    const listings = await assetlayer.listings.getUserListings({ sellerOnly, buyerOnly, status, collectionId, countsOnly, walletUserId });
 
     return res.json(listings);
   }
@@ -60,27 +59,30 @@ export const getAppListings = async (req: GetAppListingsRequest, res: CustomResp
   }
 }
 
-type CreateListingRequest = Request<{},{},CreateListingProps,CreateListingProps>;
+type CreateListingRequest = Request<{},{},CreateListingAllProps,CreateListingAllProps>;
 export const createListing = async (req: CreateListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { handle, price, nftId, nftIds, collectionId, liveTime, status } = { ...req.body, ...req.query };
+    const { price, assetId, assetIds, collectionId, liveTime, status, walletUserId } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.listings.createListing({ handle, price, nftId, nftIds, collectionId, liveTime, status });
+    if (!(assetId || assetIds || collectionId)) throw new Error('Must provide either assetId, assetIds, or collectionId');
 
-    return res.json(success);
+    const result = (assetId) ? await assetlayer.listings.createListing({ price, assetId, liveTime, status, walletUserId })
+      : (assetIds) ? await assetlayer.listings.createListings({ price, assetIds, liveTime, status, walletUserId })
+      : await assetlayer.listings.createCollectionListings({ price, collectionId, liveTime, status, walletUserId });
+
+    return res.json(result);
   }
   catch (e) {
     return next(e);
   }
 }
 
-type BuyListingProps = { listingId: string; handle: string; price?: number; };
 type BuyListingRequest = Request<{},{},BuyListingProps,BuyListingProps>;
 export const buyListing = async (req: BuyListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { listingId, handle, price } = { ...req.body, ...req.query };
+    const { listingId, price } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.listings.buyListing(listingId, handle, price);
+    const success = await assetlayer.listings.buyListing({ listingId, price });
 
     return res.json(success);
   }
@@ -92,9 +94,9 @@ export const buyListing = async (req: BuyListingRequest, res: CustomResponse, ne
 type UpdateListingRequest = Request<{},{},UpdateListingProps,UpdateListingProps>;
 export const updateListing = async (req: UpdateListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { listingId, handle, price, liveTime, status } = { ...req.body, ...req.query };
+    const { listingId, price, liveTime, status, walletUserId } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.listings.updateListing({ listingId, handle, price, liveTime, status });
+    const success = await assetlayer.listings.updateListing({ listingId, price, liveTime, status, walletUserId });
 
     return res.json(success);
   }
@@ -103,13 +105,12 @@ export const updateListing = async (req: UpdateListingRequest, res: CustomRespon
   }
 }
 
-type RemoveListingProps = { listingId: string; handle: string; };
 type RemoveListingRequest = Request<{},{},RemoveListingProps,RemoveListingProps>;
 export const removeListing = async (req: RemoveListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { listingId, handle } = { ...req.body, ...req.query };
+    const { listingId, walletUserId } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.listings.removeListing(listingId, handle);
+    const success = await assetlayer.listings.removeListing({ listingId, walletUserId });
 
     return res.json(success);
   }

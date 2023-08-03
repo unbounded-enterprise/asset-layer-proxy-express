@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { getEquip, removeEquip, setEquip } from './handlers';
+import { getEquips, removeEquip, setEquip } from './handlers';
 
 const equipsRouter: Router = Router();
 
-equipsRouter.get('/info', getEquip);
+equipsRouter.get('/info', getEquips);
 
 equipsRouter.post('/new', setEquip);
 

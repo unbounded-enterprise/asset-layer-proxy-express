@@ -1,12 +1,12 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { GetEquipProps, RemoveEquipProps, SetEquipProps } from "@assetlayer/sdk/dist/types/equip";
+import { GetEquipsProps, RemoveEquipProps, SetEquipProps } from "@assetlayer/sdk/dist/types/equip";
 
-type GetEquipRequest = Request<{},{},GetEquipProps,GetEquipProps>;
-export const getEquip = async (req: GetEquipRequest, res: CustomResponse, next: NextFunction) => {
+type GetEquipRequest = Request<{},{},GetEquipsProps,GetEquipsProps>;
+export const getEquips = async (req: GetEquipRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const asset = await assetlayer.equips.getEquip({ ...req.body, ...req.query });
+    const asset = await assetlayer.equips.getEquips({ ...req.body, ...req.query });
 
     return res.json(asset);
   }

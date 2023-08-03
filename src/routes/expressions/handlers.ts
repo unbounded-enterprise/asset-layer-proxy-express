@@ -1,7 +1,7 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { CreateExpressionProps, UpdateAssetExpressionValuesProps, UpdateAssetsExpressionValuesProps, UpdateBulkExpressionValuesProps, UpdateCollectionExpressionValuesProps, UpdateExpressionProps } from "@assetlayer/sdk/dist/types/expression";
+import { CreateExpressionProps, GetSlotExpressionsProps, UpdateAssetExpressionValueProps, UpdateAssetsExpressionValueProps, UpdateBulkExpressionValuesProps, UpdateCollectionAssetsExpressionValueProps, UpdateExpressionProps } from "@assetlayer/sdk/dist/types/expression";
 
 export const getExpressionTypes = async (req: Request, res: CustomResponse, next: NextFunction) => {
   try {
@@ -14,13 +14,12 @@ export const getExpressionTypes = async (req: Request, res: CustomResponse, next
   }
 }
 
-type GetSlotExpressionsProps = { slotId: string; };
 type GetSlotExpressionsRequest = Request<{},{},GetSlotExpressionsProps,GetSlotExpressionsProps>;
 export const getSlotExpressions = async (req: GetSlotExpressionsRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const slotId = req.query.slotId || req.body.slotId;
 
-    const expressions = await assetlayer.expressions.getSlotExpressions(slotId);
+    const expressions = await assetlayer.expressions.getSlotExpressions({ slotId });
 
     return res.json(expressions);
   }
@@ -57,12 +56,12 @@ export const updateExpression = async (req: UpdateExpressionRequest, res: Custom
   }
 }
 
-type UpdateAssetExpressionValuesRequest = Request<{},{},UpdateAssetExpressionValuesProps,UpdateAssetExpressionValuesProps>;
-export const updateAssetExpressionValues = async (req: UpdateAssetExpressionValuesRequest, res: CustomResponse, next: NextFunction) => {
+type UpdateAssetExpressionValuesRequest = Request<{},{},UpdateAssetExpressionValueProps,UpdateAssetExpressionValueProps>;
+export const updateAssetExpressionValue = async (req: UpdateAssetExpressionValuesRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { nftId, expressionAttributeName, value, expressionId, expressionName } = { ...req.body, ...req.query };
+    const { assetId, expressionAttributeName, value, expressionId, expressionName } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.expressions.updateAssetExpressionValues({ nftId, expressionAttributeName, value, expressionId, expressionName });
+    const success = await assetlayer.expressions.updateAssetExpressionValue({ assetId, expressionAttributeName, value, expressionId, expressionName });
 
     return res.json(success);
   }
@@ -71,12 +70,12 @@ export const updateAssetExpressionValues = async (req: UpdateAssetExpressionValu
   }
 }
 
-type UpdateAssetsExpressionValuesRequest = Request<{},{},UpdateAssetsExpressionValuesProps,UpdateAssetsExpressionValuesProps>;
-export const updateAssetsExpressionValues = async (req: UpdateAssetsExpressionValuesRequest, res: CustomResponse, next: NextFunction) => {
+type UpdateAssetsExpressionValuesRequest = Request<{},{},UpdateAssetsExpressionValueProps,UpdateAssetsExpressionValueProps>;
+export const updateAssetsExpressionValue = async (req: UpdateAssetsExpressionValuesRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { expressionAttributeName, value, nftIds, collectionId, expressionId, expressionName } = { ...req.body, ...req.query };
+    const { expressionAttributeName, value, assetIds, collectionId, expressionId, expressionName } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.expressions.updateAssetsExpressionValues({ expressionAttributeName, value, nftIds, collectionId, expressionId, expressionName });
+    const success = await assetlayer.expressions.updateAssetsExpressionValue({ expressionAttributeName, value, assetIds, collectionId, expressionId, expressionName });
 
     return res.json(success);
   }
@@ -85,12 +84,12 @@ export const updateAssetsExpressionValues = async (req: UpdateAssetsExpressionVa
   }
 }
 
-type UpdateCollectionExpressionValuesRequest = Request<{},{},UpdateCollectionExpressionValuesProps,UpdateCollectionExpressionValuesProps>;
-export const updateCollectionExpressionValues = async (req: UpdateCollectionExpressionValuesRequest, res: CustomResponse, next: NextFunction) => {
+type UpdateCollectionExpressionValuesRequest = Request<{},{},UpdateCollectionAssetsExpressionValueProps,UpdateCollectionAssetsExpressionValueProps>;
+export const updateCollectionAssetsExpressionValue = async (req: UpdateCollectionExpressionValuesRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const { collectionId, expressionAttributeName, value, expressionId, expressionName } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.expressions.updateCollectionExpressionValues({ collectionId, expressionAttributeName, value, expressionId, expressionName });
+    const success = await assetlayer.expressions.updateCollectionAssetsExpressionValue({ collectionId, expressionAttributeName, value, expressionId, expressionName });
 
     return res.json(success);
   }
