@@ -68,7 +68,7 @@ export const createListing = async (req: CreateListingRequest, res: CustomRespon
 
     const result = (assetId) ? await assetlayer.listings.createListing({ price, assetId, liveTime, status, walletUserId })
       : (assetIds) ? await assetlayer.listings.createListings({ price, assetIds, liveTime, status, walletUserId })
-      : await assetlayer.listings.createCollectionListings({ price, collectionId, liveTime, status, walletUserId });
+      : await assetlayer.listings.createCollectionListings({ price, collectionId: collectionId!, liveTime, status, walletUserId });
 
     return res.json(result);
   }

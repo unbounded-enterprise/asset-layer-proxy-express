@@ -1,7 +1,7 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { GetUserAssetsProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
+import { GetUserAssetsProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetAllProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
 
 type GetAssetProps = { assetId?: string; assetIds?: string[]; };
 type GetAssetRequest = Request<{},{},GetAssetProps,GetAssetProps>;
@@ -120,7 +120,6 @@ export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, ne
   }
 }
 
-type SendAssetAllProps = { receiver: string; walletUserId?: string; assetId?: string; assetIds?: string[]; collectionId?: string; };
 type SendAssetRequest = Request<{},{},SendAssetAllProps,SendAssetAllProps>;
 export const sendAsset = async (req: SendAssetRequest, res: CustomResponse, next: NextFunction) => {
   try {
