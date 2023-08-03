@@ -2,6 +2,8 @@ import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { GetUserAssetsProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetAllProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
+import { IncomingHttpHeaders } from "http";
+import { incomingHeadersToHeadersInit } from "../../utils/basic-format";
 
 type GetAssetProps = { assetId?: string; assetIds?: string[]; };
 type GetAssetRequest = Request<{},{},GetAssetProps,GetAssetProps>;
@@ -39,9 +41,10 @@ export const getAssets = async (req: GetAssetRequest, res: CustomResponse, next:
 type GetUserAssetsRequest = Request<{},{},GetUserAssetsProps,GetUserAssetsProps>;
 export const getUserAssets = async (req: GetUserAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { walletUserId, idOnly } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.getUserAssets({ walletUserId, idOnly });
+    const assets = await assetlayer.assets.getUserAssets({ walletUserId, idOnly }, headers);
 
     return res.json(assets);
   }
@@ -53,9 +56,10 @@ export const getUserAssets = async (req: GetUserAssetsRequest, res: CustomRespon
 type GetUserCollectionAssetsRequest = Request<{},{},GetUserCollectionAssetsProps,GetUserCollectionAssetsProps>;
 export const getUserCollectionAssets = async (req: GetUserCollectionAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { collectionId, walletUserId, serials, range, idOnly, countsOnly } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.getUserCollectionAssets({ collectionId, walletUserId, serials, range, idOnly, countsOnly });
+    const assets = await assetlayer.assets.getUserCollectionAssets({ collectionId, walletUserId, serials, range, idOnly, countsOnly }, headers);
 
     return res.json(assets);
   }
@@ -67,9 +71,10 @@ export const getUserCollectionAssets = async (req: GetUserCollectionAssetsReques
 type GetUserCollectionsAssetsRequest = Request<{},{},GetUserCollectionsAssetsProps,GetUserCollectionsAssetsProps>;
 export const getUserCollectionsAssets = async (req: GetUserCollectionsAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { collectionIds, walletUserId, idOnly, countsOnly } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.getUserCollectionsAssets({ collectionIds, walletUserId, idOnly, countsOnly });
+    const assets = await assetlayer.assets.getUserCollectionsAssets({ collectionIds, walletUserId, idOnly, countsOnly }, headers);
 
     return res.json(assets);
   }
@@ -81,9 +86,10 @@ export const getUserCollectionsAssets = async (req: GetUserCollectionsAssetsRequ
 type GetUserSlotAssetsRequest = Request<{},{},GetUserSlotAssetsProps,GetUserSlotAssetsProps>;
 export const getUserSlotAssets = async (req: GetUserSlotAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { slotId, walletUserId, idOnly, countsOnly } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.getUserSlotAssets({ slotId, walletUserId, idOnly, countsOnly });
+    const assets = await assetlayer.assets.getUserSlotAssets({ slotId, walletUserId, idOnly, countsOnly }, headers);
 
     return res.json(assets);
   }
@@ -95,9 +101,10 @@ export const getUserSlotAssets = async (req: GetUserSlotAssetsRequest, res: Cust
 type GetUserSlotsAssetsRequest = Request<{},{},GetUserSlotsAssetsProps,GetUserSlotsAssetsProps>;
 export const getUserSlotsAssets = async (req: GetUserSlotsAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { slotIds, walletUserId, includeDeactivated, idOnly, countsOnly } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.getUserSlotsAssets({ slotIds, walletUserId, includeDeactivated, idOnly, countsOnly });
+    const assets = await assetlayer.assets.getUserSlotsAssets({ slotIds, walletUserId, includeDeactivated, idOnly, countsOnly }, headers);
 
     return res.json(assets);
   }
@@ -109,9 +116,10 @@ export const getUserSlotsAssets = async (req: GetUserSlotsAssetsRequest, res: Cu
 type MintAssetsRequest = Request<{},{},MintAssetsProps,MintAssetsProps>;
 export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { collectionId, number, walletUserId } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.mintAssets({ collectionId, number, walletUserId });
+    const assets = await assetlayer.assets.mintAssets({ collectionId, number, walletUserId }, headers);
 
     return res.json(assets);
   }
@@ -123,13 +131,14 @@ export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, ne
 type SendAssetRequest = Request<{},{},SendAssetAllProps,SendAssetAllProps>;
 export const sendAsset = async (req: SendAssetRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { receiver, walletUserId, assetId, assetIds, collectionId } = { ...req.body, ...req.query };
 
     if (!(assetId || assetIds || collectionId)) throw new Error('Must provide either assetId, assetIds or collectionId');
 
-    const result = (assetId) ? await assetlayer.assets.sendAsset({ receiver, assetId, walletUserId })
-      : (assetIds) ? await assetlayer.assets.sendAssets({ receiver, assetIds, walletUserId })
-      : await assetlayer.assets.sendCollectionAssets({ receiver, collectionId: collectionId!, walletUserId });
+    const result = (assetId) ? await assetlayer.assets.sendAsset({ receiver, assetId, walletUserId }, headers)
+      : (assetIds) ? await assetlayer.assets.sendAssets({ receiver, assetIds, walletUserId }, headers)
+      : await assetlayer.assets.sendCollectionAssets({ receiver, collectionId: collectionId!, walletUserId }, headers);
 
     return res.json(result);
   }
@@ -141,9 +150,10 @@ export const sendAsset = async (req: SendAssetRequest, res: CustomResponse, next
 type SendAssetsRequest = Request<{},{},SendAssetsProps,SendAssetsProps>;
 export const sendAssets = async (req: SendAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { receiver, assetIds, walletUserId } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.sendAssets({ receiver, assetIds, walletUserId });
+    const assets = await assetlayer.assets.sendAssets({ receiver, assetIds, walletUserId }, headers);
 
     return res.json(assets);
   }
@@ -155,9 +165,10 @@ export const sendAssets = async (req: SendAssetsRequest, res: CustomResponse, ne
 type SendCollectionAssetsRequest = Request<{},{},SendCollectionAssetsProps,SendCollectionAssetsProps>;
 export const sendCollectionAssets = async (req: SendCollectionAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { receiver, collectionId, walletUserId } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.sendCollectionAssets({ receiver, collectionId, walletUserId });
+    const assets = await assetlayer.assets.sendCollectionAssets({ receiver, collectionId, walletUserId }, headers);
 
     return res.json(assets);
   }
@@ -169,9 +180,10 @@ export const sendCollectionAssets = async (req: SendCollectionAssetsRequest, res
 type SendLowestAssetRequest = Request<{},{},SendCollectionAssetsProps,SendCollectionAssetsProps>;
 export const sendLowestAsset = async (req: SendLowestAssetRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { receiver, collectionId, walletUserId } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.sendLowestAsset({ receiver, collectionId, walletUserId });
+    const assets = await assetlayer.assets.sendLowestAsset({ receiver, collectionId, walletUserId }, headers);
 
     return res.json(assets);
   }
@@ -183,9 +195,10 @@ export const sendLowestAsset = async (req: SendLowestAssetRequest, res: CustomRe
 type SendRandomAssetRequest = Request<{},{},SendCollectionAssetsProps,SendCollectionAssetsProps>;
 export const sendRandomAsset = async (req: SendRandomAssetRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = incomingHeadersToHeadersInit(req.headers);
     const { receiver, collectionId, walletUserId } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.assets.sendRandomAsset({ receiver, collectionId, walletUserId });
+    const assets = await assetlayer.assets.sendRandomAsset({ receiver, collectionId, walletUserId }, headers);
 
     return res.json(assets);
   }

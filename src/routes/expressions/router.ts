@@ -5,13 +5,11 @@ const expressionsRouter: Router = Router();
 
 expressionsRouter.get('/types', getExpressionTypes);
 expressionsRouter.get('/slot', getSlotExpressions);
-
 expressionsRouter.post('/new', createExpression);
-
 expressionsRouter.put('/update', updateExpression);
 
-expressionsRouter.post('/values/nft', updateAssetExpressionValue);
-expressionsRouter.post('/values/nfts', updateAssetsExpressionValue);
+expressionsRouter.post('/values/asset', updateAssetExpressionValue);
+expressionsRouter.post('/values/assets', updateAssetsExpressionValue);
 expressionsRouter.post('/values/collection', updateCollectionAssetsExpressionValue);
 expressionsRouter.post('/values/bulk', updateBulkExpressionValues);
 

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getSlot, getSlotCollections } from './handlers';
+import { createExpression, getExpressionTypes, getSlotExpressions, updateExpression } from '../expressions/handlers';
 
 const slotsRouter: Router = Router();
 
@@ -11,5 +12,10 @@ slotsRouter.get('/collections', getSlotCollections);
 // slotsRouter.post('/remove', removeSlot);
 
 // slotsRouter.put('/update', updateSlot);
+
+slotsRouter.get('/expressions/types', getExpressionTypes);
+slotsRouter.get('/expressions', getSlotExpressions);
+slotsRouter.post('/expressions/new', createExpression);
+slotsRouter.put('/expressions/update', updateExpression);
 
 export default slotsRouter;
