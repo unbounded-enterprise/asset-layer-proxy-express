@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { getAsset, getAssets, getUserAssets, getUserCollectionAssets, getUserCollectionsAssets, getUserSlotAssets, getUserSlotsAssets, mintAssets, sendAsset, sendLowestAsset, sendRandomAsset, updateAsset } from './handlers';
-import { updateAssetExpressionValue, updateBulkExpressionValues } from '../expressions/handlers';
+import { getAsset, getAssets, getUserAssets, getUserCollectionAssets, getUserCollectionsAssets, getUserSlotAssets, getUserSlotsAssets, mintAssets, send, sendAsset, sendAssets, sendCollectionAssets, sendLowestAsset, sendRandomAsset, updateAsset } from './handlers';
+import { updateBulkExpressionValues, updateExpressionValues } from '../expressions/handlers';
 
 const assetsRouter: Router = Router();
 
@@ -13,15 +13,13 @@ assetsRouter.get('/slot', getUserSlotAssets);
 assetsRouter.get('/slots', getUserSlotsAssets);
 
 assetsRouter.post('/mint', mintAssets);
-assetsRouter.post('/send', sendAsset);
+assetsRouter.post('/send', send);
 assetsRouter.post('/sendLowest', sendLowestAsset);
 assetsRouter.post('/sendRandom', sendRandomAsset);
 
 assetsRouter.put('/update', updateAsset);
 
-assetsRouter.post('/asset/expressionValues', updateAssetExpressionValue);
-// assetsRouter.post('/asset/expressionValues/assets', updateAssetsExpressionValue);
-// assetsRouter.post('/asset/expressionValues/collection', updateCollectionAssetsExpressionValue);
+assetsRouter.post('/asset/expressionValues', updateExpressionValues);
 assetsRouter.post('/asset/expressionValuesBulk', updateBulkExpressionValues);
 
 export default assetsRouter;
