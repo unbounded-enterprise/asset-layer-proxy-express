@@ -5,14 +5,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="styles.css" />
-    <!-- 1️⃣ Install Asset Layer SDK -->
+    <!-- 1️⃣ Load Asset Layer SDK -->
     <script src="https://unpkg.com/@assetlayer/sdk-client@latest/dist/index.umd.js"></script>
     <script>
-      /* 2️⃣ Initialize Magic Instance */
+      /* 2️⃣ Define AssetLayer and User variables */
       let assetlayer;
       let user;
 
-      /* 3️⃣ Implement Render Function */
+      /* 3️⃣ Set the page content */
       const render = async () => {
         let html = (!!user) ? `
           <h1>Hello ${user.handle}</h1>
@@ -33,13 +33,14 @@
         document.getElementById('app').innerHTML = html;
       };
 
-      /* 4️⃣ Implement Login Handler */
+      /* 4️⃣ Initialize Asset Layer SDK with an App Secret */
       const handleAppSecret = async (e) => {
         e.preventDefault();
         const appSecret = new FormData(e.target).get('appSecret');
         if (appSecret) {
           assetlayer = new AssetLayer.AssetLayer({ appSecret });
 
+          /* Initialize User if Logged In */
           const loggedIn = await assetlayer.initialize();
           if (loggedIn) user = await assetlayer.users.getUser();
 
@@ -47,21 +48,23 @@
         }
       };
 
-      const handleUser = async (e) => {
+      /* 5️⃣ Implement callback to handle successful login */
+      const handleLoginSuccess = async (e) => {
         const u = await assetlayer.users.getUser();
         console.log('user', u);
         user = u;
         render();
       };
 
-      /* 4️⃣ Implement Login Handler */
+      /* 6️⃣ Prompt User for email to sign in with OTP */
       const handleLogin = async (e) => {
         e.preventDefault();
         
-        assetlayer.loginUser({ callback: handleUser });
+        /* Pass in callback to retrieve user after login */
+        assetlayer.loginUser({ callback: handleLoginSuccess });
       };
 
-      /* 5️⃣ Implement Logout Handler */
+      /* 7️⃣ Implement Logout Handler */
       const handleLogout = async () => {
         await assetlayer.logoutUser();
         user = undefined;
