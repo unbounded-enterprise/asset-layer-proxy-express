@@ -48,7 +48,7 @@
         }
       };
 
-      /* 5️⃣ Implement callback to handle successful login */
+      /* 5️⃣ Implement success callback to handle successful login */
       const handleLoginSuccess = async (e) => {
         const u = await assetlayer.users.getUser();
         console.log('user', u);
@@ -60,8 +60,8 @@
       const handleLogin = async (e) => {
         e.preventDefault();
         
-        /* Pass in callback to retrieve user after login */
-        assetlayer.loginUser({ callback: handleLoginSuccess });
+        /* Pass in a callback to retrieve user after login */
+        assetlayer.loginUser({ onSuccess: handleLoginSuccess });
       };
 
       /* 7️⃣ Implement Logout Handler */
