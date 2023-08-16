@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Asset Layer Hello World 🌎</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <!-- 1️⃣ Install Asset Layer SDK -->
+    <script src="https://unpkg.com/@assetlayer/sdk-client@latest/dist/index.umd.js"></script>
+    <script>
+      /* 2️⃣ Initialize Magic Instance */
+      let assetlayer;
+      let user;
+
+      /* 3️⃣ Implement Render Function */
+      const render = async () => {
+        let html = (!!user) ? `
+          <h1>Hello ${user.handle}</h1>
+          <button onclick="handleLogout()">Logout</button>
+        `: (!!assetlayer) ? `
+          <h1>Please Login</h1>
+          <form onsubmit="handleLogin(event)">
+            <button type="submit">Open</button>
+          </form>
+        ` : `
+          <h1>Please Enter App Secret</h1>
+          <form onsubmit="handleAppSecret(event)">
+            <input type="password" name="appSecret" required="required" placeholder="Enter your App Secret" />
+            <button type="submit">Initialize</button>
+          </form>
+        `;
+
+        document.getElementById('app').innerHTML = html;
+      };
+
+      /* 4️⃣ Implement Login Handler */
+      const handleAppSecret = async (e) => {
+        e.preventDefault();
+        const appSecret = new FormData(e.target).get('appSecret');
+        if (appSecret) {
+          assetlayer = new AssetLayer.AssetLayer({ appSecret });
+
+          const loggedIn = await assetlayer.initialize();
+          if (loggedIn) user = await assetlayer.users.getUser();
+
+          render(appSecret);
+        }
+      };
+
+      const handleUser = async (e) => {
+        const u = await assetlayer.users.getUser();
+        console.log('user', u);
+        user = u;
+        render();
+      };
+
+      /* 4️⃣ Implement Login Handler */
+      const handleLogin = async (e) => {
+        e.preventDefault();
+        
+        assetlayer.loginUser({ callback: handleUser });
+      };
+
+      /* 5️⃣ Implement Logout Handler */
+      const handleLogout = async () => {
+        await assetlayer.logoutUser();
+        user = undefined;
+        render();
+      };
+    </script>
+  </head>
+  <body onload="render()">
+    <div id="app">Loading...</div>
+  </body>
+</html>

@@ -48,6 +48,14 @@ app.use(`${apiRoute}/slot`, slotsRouter);
 // app.use(`${apiRoute}/stripe`, stripeRouter);
 // app.use(`${apiRoute}/team`, teamRouter);
 app.use(`${apiRoute}/user`, usersRouter);
+app.use('/test', async (req: any, res: any, next: NextFunction) => {
+  try {
+    return res.sendFile('test.html', { root: 'src' });
+  }
+  catch (e) {
+    return next(e);
+  }
+});
 app.use('/', async (req: any, res: any, next: NextFunction) => {
   try {
     return res.sendFile('did.html', { root: 'src' });
@@ -55,7 +63,7 @@ app.use('/', async (req: any, res: any, next: NextFunction) => {
   catch (e) {
     return next(e);
   }
-})
+});
 
 app.use(errorHandler);
 
