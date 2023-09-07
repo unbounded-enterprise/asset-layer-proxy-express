@@ -7,6 +7,6 @@ equipsRouter.get('/info', getEquips);
 
 equipsRouter.post('/new', setEquip);
 
-equipsRouter.put('/', removeEquip);
+equipsRouter.delete('/', removeEquip);
 
 export default equipsRouter;

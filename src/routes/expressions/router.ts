@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createExpression, getExpressionTypes, getSlotExpressions, updateAssetExpressionValue, updateAssetsExpressionValue, updateBulkExpressionValues, updateCollectionAssetsExpressionValue, updateExpression, updateExpressionValues } from './handlers';
+import { createExpression, getExpressionTypes, getSlotExpressions, updateBulkExpressionValues, updateExpression, updateExpressionValues } from './handlers';
 
 const expressionsRouter: Router = Router();
 
@@ -10,9 +10,6 @@ expressionsRouter.post('/new', createExpression);
 expressionsRouter.put('/update', updateExpression);
 
 expressionsRouter.post('/values', updateExpressionValues);
-expressionsRouter.post('/values/asset', updateAssetExpressionValue);
-expressionsRouter.post('/values/assets', updateAssetsExpressionValue);
-expressionsRouter.post('/values/collection', updateCollectionAssetsExpressionValue);
 expressionsRouter.post('/values/bulk', updateBulkExpressionValues);
 */
 

@@ -5,6 +5,7 @@ import { AssetLayer } from '@assetlayer/sdk';
 import appsRouter from './routes/apps/router';
 import assetsRouter from './routes/assets/router';
 import collectionsRouter from './routes/collections/router';
+import currenciesRouter from './routes/currencies/router';
 import equipsRouter from './routes/equips/router';
 // import expressionsRouter from './routes/expressions/router';
 import listingsRouter from './routes/listings/router';
@@ -30,14 +31,16 @@ function init() {
 }
 function errorHandler(e: unknown, req: Request, res: Response, next: NextFunction) {
   const error = parseBasicError(e);
-
-  if (validErrorStatusCodes.has(error.status)) return res.status(error.status).send(error.message);
-  else return res.status(500).send();
+  const statusCode = error.status || 500;
+  const message = error.message || 'Request Failed';
+  
+  return res.status(error.status).json({ statusCode, success: false, message });
 }
 
 app.use(`${apiRoute}/app`, appsRouter);
 app.use(`${apiRoute}/asset`, assetsRouter);
 app.use(`${apiRoute}/collection`, collectionsRouter);
+app.use(`${apiRoute}/currency`, currenciesRouter);
 app.use(`${apiRoute}/equip`, equipsRouter);
 // app.use(`${apiRoute}/expression`, expressionsRouter);
 // app.use(`${apiRoute}/handcash`, handcashRouter);

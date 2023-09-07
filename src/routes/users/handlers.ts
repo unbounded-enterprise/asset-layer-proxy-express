@@ -5,9 +5,9 @@ import { CustomResponse } from "../../types/basic-types";
 type GetUserRequest = Request<{},{},{},{}>;
 export const getUser = async (req: GetUserRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const user = await assetlayer.users.getUser();
+    const response = await assetlayer.users.raw.getUser();
 
-    return res.json(user);
+    return res.json(response);
   }
   catch (e) {
     return next(e);

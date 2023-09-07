@@ -1,17 +1,16 @@
 import { Router } from 'express';
-import { getApp, getAppSlots, getApps } from './handlers';
+import { info, slots } from './handlers';
 
 const appsRouter: Router = Router();
 
-appsRouter.get('/info', getApp);
-appsRouter.get('/infos', getApps);
-appsRouter.get('/slots', getAppSlots);
-// appRouter.get('/listings', appsHandler.getAppsWithListings);
-// appRouter.get('/secret', appsHandler.getAppSecret);
+appsRouter.get('/info', info);
+appsRouter.get('/slots', slots);
+// appRouter.get('/listings', listings);
+// appRouter.get('/secret', secret);
 
-// appRouter.post('/secret/reset', appsHandler.resetAppSecret);
-// appRouter.post('/new', appsHandler.addApp);
+// appRouter.post('/secret/reset', resetSecret);
+// appRouter.post('/new', newApp);
 
-// appRouter.put('/update', appsHandler.updateApp);
+// appRouter.put('/update', update);
 
 export default appsRouter;

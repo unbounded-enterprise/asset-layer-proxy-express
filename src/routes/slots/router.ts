@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { getSlot, getSlotCollections } from './handlers';
+import { collections, getSlot } from './handlers';
 import { createExpression, getExpressionTypes, getSlotExpressions, updateExpression } from '../expressions/handlers';
 
 const slotsRouter: Router = Router();
 
 slotsRouter.get('/info', getSlot);
-slotsRouter.get('/collections', getSlotCollections);
+slotsRouter.get('/collections', collections);
 
 // slotsRouter.post('/new', createSlot);
 // slotsRouter.post('/add', addSlot);

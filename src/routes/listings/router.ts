@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import { buyListing, createListing, getAppListings, getCollectionListings, getListing, getUserListings, removeListing, updateListing } from './handlers';
+import { app, buyListing, collection, info, newListing, removeListing, updateListing, user } from './handlers';
 
 const listingsRouter: Router = Router();
 
-listingsRouter.get('/info', getListing);
-listingsRouter.get('/user', getUserListings);
-listingsRouter.get('/collection', getCollectionListings);
-listingsRouter.get('/app', getAppListings);
+listingsRouter.get('/info', info);
+listingsRouter.get('/user', user);
+listingsRouter.get('/collection', collection);
+listingsRouter.get('/app', app);
 
-listingsRouter.post('/new', createListing);
+listingsRouter.post('/new', newListing);
 listingsRouter.post('/buy', buyListing);
 
 listingsRouter.put('/update', updateListing);

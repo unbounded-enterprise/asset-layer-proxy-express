@@ -1,49 +1,32 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { ActivateCollectionProps, CreateCollectionProps, GetCollectionAssetsProps, UpdateCollectionImageProps, UpdateCollectionProps } from "@assetlayer/sdk/dist/types/collection";
+import { ActivateCollectionProps, CollectionAssetsProps, CollectionInfoProps, CreateCollectionProps, GetCollectionAssetsProps, UpdateCollectionImageProps, UpdateCollectionProps } from "@assetlayer/sdk/dist/types/collection";
 
-type GetCollectionProps = { collectionId?: string; collectionIds?: string[]; };
-type GetCollectionRequest = Request<{},{},GetCollectionProps,GetCollectionProps>;
-export const getCollection = async (req: GetCollectionRequest, res: CustomResponse, next: NextFunction) => {
+type CollectionInfoRequest = Request<{},{},CollectionInfoProps,CollectionInfoProps>;
+export const info = async (req: CollectionInfoRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const { collectionId, collectionIds } = { ...req.body, ...req.query };
 
-    if (collectionIds) return await getCollections(req, res, next)
-    else if (!collectionId) throw new Error('Missing collectionId');
+    if (!(collectionId || collectionIds)) throw new Error('Missing collectionId(s)');
 
-    const collection = await assetlayer.collections.getCollection({ collectionId });
+    const response = await assetlayer.collections.raw.info({ collectionId, collectionIds });
 
-    return res.json(collection);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
   }
 }
 
-export const getCollections = async (req: GetCollectionRequest, res: CustomResponse, next: NextFunction) => {
-  try {
-    const { collectionId, collectionIds=[] } = { ...req.body, ...req.query };
-
-    if (collectionId) collectionIds.push(collectionId);
-
-    const collections = await assetlayer.collections.getCollections({ collectionIds });
-
-    return res.json(collections);
-  }
-  catch (e) {
-    return next(e);
-  }
-}
-
-type GetCollectionAssetsRequest = Request<{},{},GetCollectionAssetsProps,GetCollectionAssetsProps>;
-export const getCollectionAssets = async (req: GetCollectionAssetsRequest, res: CustomResponse, next: NextFunction) => {
+type CollectionAssetsRequest = Request<{},{},CollectionAssetsProps,CollectionAssetsProps>;
+export const assets = async (req: CollectionAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const { collectionId, serials, idOnly } = { ...req.body, ...req.query };
 
-    const assets = await assetlayer.collections.getCollectionAssets({ collectionId, serials, idOnly });
+    const response = await assetlayer.collections.raw.assets({ collectionId, serials, idOnly });
 
-    return res.json(assets);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
@@ -56,12 +39,12 @@ export const createCollection = async (req: CreateCollectionRequest, res: Custom
     const { collectionName, slotId, type, maximum, description, tags, royaltyRecipient, 
       collectionImage, collectionBanner, properties, walletUserId } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.collections.createCollection({ 
+    const response = await assetlayer.collections.raw.createCollection({ 
       collectionName, slotId, type, maximum, description, tags, royaltyRecipient, 
       collectionImage, collectionBanner, properties, walletUserId
     });
 
-    return res.json(success);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
@@ -73,11 +56,11 @@ export const updateCollection = async (req: UpdateCollectionRequest, res: Custom
   try {
     const { collectionId, description, tags, royaltyRecipient, collectionImage, collectionBanner, properties } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.collections.updateCollection({ 
+    const response = await assetlayer.collections.raw.updateCollection({ 
       collectionId, description, tags, royaltyRecipient, collectionImage, collectionBanner, properties 
     });
 
-    return res.json(success);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
@@ -89,9 +72,9 @@ export const activateCollection = async (req: ActivateCollectionRequest, res: Cu
   try {
     const collectionId = req.query.collectionId || req.body.collectionId;
 
-    const success = await assetlayer.collections.activateCollection({ collectionId });
+    const response = await assetlayer.collections.raw.activateCollection({ collectionId });
 
-    return res.json(success);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
@@ -102,9 +85,9 @@ export const deactivateCollection = async (req: ActivateCollectionRequest, res: 
   try {
     const collectionId = req.query.collectionId || req.body.collectionId;
 
-    const success = await assetlayer.collections.deactivateCollection({ collectionId });
+    const response = await assetlayer.collections.raw.deactivateCollection({ collectionId });
 
-    return res.json(success);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
@@ -116,9 +99,9 @@ export const updateCollectionImage = async (req: UpdateCollectionImageRequest, r
   try {
     const { collectionId, value } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.collections.updateCollectionImage({ collectionId, value });
+    const response = await assetlayer.collections.raw.updateCollectionImage({ collectionId, value });
 
-    return res.json(success);
+    return res.json(response);
   }
   catch (e) {
     return next(e);

@@ -1,13 +1,13 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { CreateExpressionProps, GetSlotExpressionsProps, UpdateAssetsExpressionValueProps, UpdateBulkExpressionValuesProps, UpdateCollectionAssetsExpressionValueProps, UpdateExpressionValuesProps, UpdateExpressionProps, UpdateAssetExpressionValueProps } from "@assetlayer/sdk/dist/types/expression";
+import { CreateExpressionProps, GetSlotExpressionsProps, UpdateBulkExpressionValuesProps, UpdateExpressionValuesProps, UpdateExpressionProps } from "@assetlayer/sdk/dist/types/expression";
 
 export const getExpressionTypes = async (req: Request, res: CustomResponse, next: NextFunction) => {
   try {
-    const expressionTypes = await assetlayer.expressions.getExpressionTypes();
+    const response = await assetlayer.expressions.raw.getExpressionTypes();
 
-    return res.json(expressionTypes);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
@@ -19,9 +19,9 @@ export const getSlotExpressions = async (req: GetSlotExpressionsRequest, res: Cu
   try {
     const slotId = req.query.slotId || req.body.slotId;
 
-    const expressions = await assetlayer.expressions.getSlotExpressions({ slotId });
+    const response = await assetlayer.expressions.raw.getSlotExpressions({ slotId });
 
-    return res.json(expressions);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
@@ -33,9 +33,9 @@ export const createExpression = async (req: CreateExpressionRequest, res: Custom
   try {
     const { slotId, expressionTypeId, expressionName, description } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.expressions.createExpression({ slotId, expressionTypeId, expressionName, description });
+    const response = await assetlayer.expressions.raw.createExpression({ slotId, expressionTypeId, expressionName, description });
 
-    return res.json(success);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
@@ -47,9 +47,9 @@ export const updateExpression = async (req: UpdateExpressionRequest, res: Custom
   try {
     const { expressionId, expressionTypeId, expressionName, description } = { ...req.body, ...req.query };
 
-    const success = await assetlayer.expressions.updateExpression({ expressionId, expressionTypeId, expressionName, description });
+    const response = await assetlayer.expressions.raw.updateExpression({ expressionId, expressionTypeId, expressionName, description });
 
-    return res.json(success);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
@@ -61,55 +61,11 @@ export const updateExpressionValues = async (req: UpdateExpressionValuesRequest,
   try {
     const { expressionAttributeName, value, expressionId, expressionName, assetId, assetIds, collectionId } = { ...req.body, ...req.query };
 
-    if (!(assetId || assetIds || collectionId)) throw new Error('Must provide either assetId, assetIds, or collectionId');
+    if (!(assetId || assetIds || collectionId)) throw new Error('Missing assetId(s) or collectionId');
 
-    const result = (assetId) ? await assetlayer.expressions.updateAssetExpressionValue({ assetId, expressionAttributeName, value, expressionId, expressionName })
-      : (assetIds) ? await assetlayer.expressions.updateAssetsExpressionValue({ assetIds, expressionAttributeName, value, expressionId, expressionName })
-      : await assetlayer.expressions.updateCollectionAssetsExpressionValue({ collectionId: collectionId!, expressionAttributeName, value, expressionId, expressionName });
+    const result = await assetlayer.expressions.raw.updateExpressionValues({ expressionAttributeName, value, expressionId, expressionName, assetId, assetIds, collectionId });
 
     return res.json(result);
-  }
-  catch (e) {
-    return next(e);
-  }
-}
-
-type UpdateAssetExpressionValueRequest = Request<{},{},UpdateAssetExpressionValueProps,UpdateAssetExpressionValueProps>;
-export const updateAssetExpressionValue = async (req: UpdateAssetExpressionValueRequest, res: CustomResponse, next: NextFunction) => {
-  try {
-    const { assetId, expressionAttributeName, value, expressionId, expressionName } = { ...req.body, ...req.query };
-
-    const expressionValueId = await assetlayer.expressions.updateAssetExpressionValue({ assetId, expressionAttributeName, value, expressionId, expressionName });
-
-    return res.json(expressionValueId);
-  }
-  catch (e) {
-    return next(e);
-  }
-}
-
-type UpdateAssetsExpressionValueRequest = Request<{},{},UpdateAssetsExpressionValueProps,UpdateAssetsExpressionValueProps>;
-export const updateAssetsExpressionValue = async (req: UpdateAssetsExpressionValueRequest, res: CustomResponse, next: NextFunction) => {
-  try {
-    const { assetIds, expressionAttributeName, value, expressionId, expressionName } = { ...req.body, ...req.query };
-
-    const result = await assetlayer.expressions.updateAssetsExpressionValue({ expressionAttributeName, value, assetIds, expressionId, expressionName });
-
-    return res.json(result);
-  }
-  catch (e) {
-    return next(e);
-  }
-}
-
-type UpdateCollectionExpressionValueRequest = Request<{},{},UpdateCollectionAssetsExpressionValueProps,UpdateCollectionAssetsExpressionValueProps>;
-export const updateCollectionAssetsExpressionValue = async (req: UpdateCollectionExpressionValueRequest, res: CustomResponse, next: NextFunction) => {
-  try {
-    const { collectionId, expressionAttributeName, value, expressionId, expressionName } = { ...req.body, ...req.query };
-
-    const success = await assetlayer.expressions.updateCollectionAssetsExpressionValue({ collectionId, expressionAttributeName, value, expressionId, expressionName });
-
-    return res.json(success);
   }
   catch (e) {
     return next(e);
@@ -121,9 +77,9 @@ export const updateBulkExpressionValues = async (req: UpdateBulkExpressionValues
   try {
     const { collectionId, value } = { ...req.body, ...req.query };
 
-    const logs = await assetlayer.expressions.updateBulkExpressionValues({ collectionId, value });
+    const response = await assetlayer.expressions.raw.updateBulkExpressionValues({ collectionId, value });
 
-    return res.json(logs);
+    return res.json(response);
   }
   catch (e) {
     return next(e);
