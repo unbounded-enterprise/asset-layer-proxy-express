@@ -3,7 +3,7 @@ import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { AssetInfoProps, AssetSendProps, AssetUpdateProps, AssetUserProps, GetAssetHistoryProps, GetAssetOwnershipHistoryProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
 import { IncomingHttpHeaders } from "http";
-import { incomingHeadersToHeadersInit } from "../../utils/basic-format";
+import { formatIncomingHeaders } from "../../utils/basic-format";
 
 type AssetInfoRequest = Request<{},{},AssetInfoProps,AssetInfoProps>;
 export const info = async (req: AssetInfoRequest, res: CustomResponse, next: NextFunction) => {
@@ -24,7 +24,7 @@ export const info = async (req: AssetInfoRequest, res: CustomResponse, next: Nex
 type AssetUserRequest = Request<{},{},AssetUserProps,AssetUserProps>;
 export const user = async (req: AssetUserRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { walletUserId, idOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.user({ walletUserId, idOnly }, headers);
@@ -39,7 +39,7 @@ export const user = async (req: AssetUserRequest, res: CustomResponse, next: Nex
 type GetUserCollectionAssetsRequest = Request<{},{},GetUserCollectionAssetsProps,GetUserCollectionAssetsProps>;
 export const getUserCollectionAssets = async (req: GetUserCollectionAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { collectionId, walletUserId, serials, range, idOnly, countsOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getUserCollectionAssets({ collectionId, walletUserId, serials, range, idOnly, countsOnly }, headers);
@@ -54,7 +54,7 @@ export const getUserCollectionAssets = async (req: GetUserCollectionAssetsReques
 type GetUserCollectionsAssetsRequest = Request<{},{},GetUserCollectionsAssetsProps,GetUserCollectionsAssetsProps>;
 export const getUserCollectionsAssets = async (req: GetUserCollectionsAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { collectionIds, walletUserId, idOnly, countsOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getUserCollectionsAssets({ collectionIds, walletUserId, idOnly, countsOnly }, headers);
@@ -69,7 +69,7 @@ export const getUserCollectionsAssets = async (req: GetUserCollectionsAssetsRequ
 type GetUserSlotAssetsRequest = Request<{},{},GetUserSlotAssetsProps,GetUserSlotAssetsProps>;
 export const getUserSlotAssets = async (req: GetUserSlotAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { slotId, walletUserId, idOnly, countsOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getUserSlotAssets({ slotId, walletUserId, idOnly, countsOnly }, headers);
@@ -84,7 +84,7 @@ export const getUserSlotAssets = async (req: GetUserSlotAssetsRequest, res: Cust
 type GetUserSlotsAssetsRequest = Request<{},{},GetUserSlotsAssetsProps,GetUserSlotsAssetsProps>;
 export const getUserSlotsAssets = async (req: GetUserSlotsAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { slotIds, walletUserId, includeDeactivated, idOnly, countsOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getUserSlotsAssets({ slotIds, walletUserId, includeDeactivated, idOnly, countsOnly }, headers);
@@ -99,7 +99,7 @@ export const getUserSlotsAssets = async (req: GetUserSlotsAssetsRequest, res: Cu
 type GetAssetHistoryRequest = Request<{},{},GetAssetHistoryProps,GetAssetHistoryProps>;
 export const getAssetHistory = async (req: GetAssetHistoryRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { assetId, limit, start } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getAssetHistory({ assetId, limit, start }, headers);
@@ -114,7 +114,7 @@ export const getAssetHistory = async (req: GetAssetHistoryRequest, res: CustomRe
 type GetAssetMarketHistoryRequest = Request<{},{},GetAssetHistoryProps,GetAssetHistoryProps>;
 export const getAssetMarketHistory = async (req: GetAssetMarketHistoryRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { assetId, limit, start } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getAssetMarketHistory({ assetId, limit, start }, headers);
@@ -129,7 +129,7 @@ export const getAssetMarketHistory = async (req: GetAssetMarketHistoryRequest, r
 type GetAssetOwnershipHistoryRequest = Request<{},{},GetAssetOwnershipHistoryProps,GetAssetOwnershipHistoryProps>;
 export const getAssetOwnershipHistory = async (req: GetAssetOwnershipHistoryRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { assetId, limit, start, ownersOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getAssetOwnershipHistory({ assetId, limit, start, ownersOnly }, headers);
@@ -144,7 +144,7 @@ export const getAssetOwnershipHistory = async (req: GetAssetOwnershipHistoryRequ
 type MintAssetsRequest = Request<{},{},MintAssetsProps,MintAssetsProps>;
 export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { collectionId, number, walletUserId } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.mintAssets({ collectionId, number, walletUserId }, headers);
@@ -159,7 +159,7 @@ export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, ne
 type AssetSendRequest = Request<{},{},AssetSendProps,AssetSendProps>;
 export const send = async (req: AssetSendRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { receiver, walletUserId, assetId, assetIds, collectionId } = { ...req.body, ...req.query };
 
     if (!(assetId || assetIds || collectionId)) throw new Error('Missing assetId(s) or collectionId');
@@ -176,7 +176,7 @@ export const send = async (req: AssetSendRequest, res: CustomResponse, next: Nex
 type SendLowestAssetRequest = Request<{},{},SendCollectionAssetsProps,SendCollectionAssetsProps>;
 export const sendLowestAsset = async (req: SendLowestAssetRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { receiver, collectionId, walletUserId } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.sendLowestAsset({ receiver, collectionId, walletUserId }, headers);
@@ -191,7 +191,7 @@ export const sendLowestAsset = async (req: SendLowestAssetRequest, res: CustomRe
 type SendRandomAssetRequest = Request<{},{},SendCollectionAssetsProps,SendCollectionAssetsProps>;
 export const sendRandomAsset = async (req: SendRandomAssetRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { receiver, collectionId, walletUserId } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.sendRandomAsset({ receiver, collectionId, walletUserId }, headers);

@@ -3,7 +3,7 @@ import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { GetEquipsProps, RemoveEquipProps, SetEquipProps } from "@assetlayer/sdk/dist/types/equip";
 import { DecreaseCurrencyBalanceProps, GetCurrencyBalanceProps, GetCurrencyProps, GetCurrencySummaryProps, IncreaseCurrencyBalanceProps, TransferCurrencyProps } from "@assetlayer/sdk";
-import { incomingHeadersToHeadersInit } from "../../utils/basic-format";
+import { formatIncomingHeaders } from "../../utils/basic-format";
 
 type GetCurrencyRequest = Request<{},{},GetCurrencyProps,GetCurrencyProps>;
 export const getCurrency = async (req: GetCurrencyRequest, res: CustomResponse, next: NextFunction) => {
@@ -20,7 +20,7 @@ export const getCurrency = async (req: GetCurrencyRequest, res: CustomResponse, 
 type GetCurrencyBalanceRequest = Request<{},{},GetCurrencyBalanceProps,GetCurrencyBalanceProps>;
 export const getCurrencyBalance = async (req: GetCurrencyBalanceRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const response = await assetlayer.currencies.raw.getCurrencyBalance({ ...req.body, ...req.query }, headers);
 
     return res.json(response);

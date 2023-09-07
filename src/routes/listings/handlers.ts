@@ -2,7 +2,7 @@ import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { BuyListingProps, GetAppListingsProps, GetCollectionListingsProps, GetListingProps, GetUserListingsProps, ListingAppProps, ListingCollectionProps, ListingNewProps, ListingUserProps, RemoveListingProps, UpdateListingProps } from "@assetlayer/sdk/dist/types/listing";
-import { incomingHeadersToHeadersInit } from "../../utils/basic-format";
+import { formatIncomingHeaders } from "../../utils/basic-format";
 
 type ListingInfoRequest = Request<{},{},GetListingProps,GetListingProps>;
 export const info = async (req: ListingInfoRequest, res: CustomResponse, next: NextFunction) => {
@@ -21,7 +21,7 @@ export const info = async (req: ListingInfoRequest, res: CustomResponse, next: N
 type ListingUserRequest = Request<{},{},ListingUserProps,ListingUserProps>;
 export const user = async (req: ListingUserRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { sellerOnly, buyerOnly, status, collectionId, countsOnly, walletUserId } = { ...req.body, ...req.query };
 
     const response = await assetlayer.listings.raw.user({ sellerOnly, buyerOnly, status, collectionId, countsOnly, walletUserId }, headers);
@@ -64,7 +64,7 @@ export const app = async (req: ListingAppRequest, res: CustomResponse, next: Nex
 type ListingNewRequest = Request<{},{},ListingNewProps,ListingNewProps>;
 export const newListing = async (req: ListingNewRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { price, assetId, assetIds, collectionId, liveTime, status, walletUserId } = { ...req.body, ...req.query };
 
     if (!(assetId || assetIds || collectionId)) throw new Error('Must provide either assetId, assetIds, or collectionId');
@@ -81,7 +81,7 @@ export const newListing = async (req: ListingNewRequest, res: CustomResponse, ne
 type BuyListingRequest = Request<{},{},BuyListingProps,BuyListingProps>;
 export const buyListing = async (req: BuyListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { listingId, price } = { ...req.body, ...req.query };
 
     const response = await assetlayer.listings.raw.buyListing({ listingId, price }, headers);
@@ -96,7 +96,7 @@ export const buyListing = async (req: BuyListingRequest, res: CustomResponse, ne
 type UpdateListingRequest = Request<{},{},UpdateListingProps,UpdateListingProps>;
 export const updateListing = async (req: UpdateListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { listingId, price, liveTime, status, walletUserId } = { ...req.body, ...req.query };
 
     const response = await assetlayer.listings.raw.updateListing({ listingId, price, liveTime, status, walletUserId }, headers);
@@ -111,7 +111,7 @@ export const updateListing = async (req: UpdateListingRequest, res: CustomRespon
 type RemoveListingRequest = Request<{},{},RemoveListingProps,RemoveListingProps>;
 export const removeListing = async (req: RemoveListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const headers = incomingHeadersToHeadersInit(req.headers);
+    const headers = formatIncomingHeaders(req.headers);
     const { listingId, walletUserId } = { ...req.body, ...req.query };
 
     const response = await assetlayer.listings.raw.removeListing({ listingId, walletUserId }, headers);
