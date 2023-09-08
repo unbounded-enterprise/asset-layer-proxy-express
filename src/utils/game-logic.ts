@@ -435,7 +435,6 @@ export async function generateLevelProps(number: number) {
 
 export type EndLevelProps = { userId: string; playId: string; coins: number; completed: boolean; endedAt: number; };
 export type HandleLevelEndProps = { coins: number; completed: boolean; endedAt: number; };
-export type CompletionProps = { awarded: number; };
 
 export async function handleLevelEnd({ coins, completed, endedAt }: HandleLevelEndProps, dbPlay: DBPlay) {
   if (coins > dbPlay.maxCoins) throw new Error('Max coins exceeded');
