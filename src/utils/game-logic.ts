@@ -379,7 +379,11 @@ export type DBPlay = {
   platformCoins: number[];
 }
 
-export type StartLevelProps = { userId: string; number: number; startedAt: number; };
+export type StartLevelProps = { 
+  userId: string; // ObjectId used to save play
+  number: number; // level number
+  startedAt: number; // started timestamp (milliseconds) set before request
+};
 export type GeneratedLevelProps = {
   playId: ObjectId;
   totalPlatformAmount: number;
@@ -389,8 +393,6 @@ export type GeneratedLevelProps = {
 export type GeneratedPlatformProps = {
   isGap: boolean;
   gapAmount: number;
-  isObstacle: boolean;
-  obstacleAmount: number;
   isCoin: boolean;
   coinAmount: number;
 }
@@ -417,14 +419,14 @@ export async function generateLevelProps(number: number) {
     const gapAmount = (isGap) ? randomRange(config.minDistanceAmount, config.maxDistanceAmount) : 0; // roll for DistanceAmount
     gaps.push(gapAmount);
     minRunTime += (20 + gapAmount) / playerMovingSpeed;
-    const isObstacle = !!(Math.random() <= config.obstacleFrequency); // roll for isObstacle / ObstacleFrequency
-    const obstacleAmount = (isObstacle) ? randomRange(config.minObstacleAmount, config.maxObstacleAmount) : 0; // roll for ObstacleAmount
+    // const isObstacle = !!(Math.random() <= config.obstacleFrequency); // roll for isObstacle / ObstacleFrequency
+    // const obstacleAmount = randomRange(config.minObstacleAmount, config.maxObstacleAmount); // roll for ObstacleAmount
     const isCoin = !!(Math.random() <= config.coinFrequency);
     const coinAmount = (isCoin) ? randomRange(config.minCoinAmount, config.maxCoinAmount) : 0;
     coins.push(coinAmount);
     maxCoins += coinAmount;
 
-    platformProps.push({ isGap, gapAmount, isObstacle, obstacleAmount, isCoin, coinAmount });
+    platformProps.push({ isGap, gapAmount, isCoin, coinAmount });
   }
   minRunTime = Math.floor(minRunTime * 1000);
 
@@ -433,7 +435,13 @@ export async function generateLevelProps(number: number) {
   return [levelProps, minRunTime, maxCoins, gaps, coins] as const;
 }
 
-export type EndLevelProps = { userId: string; playId: string; coins: number; completed: boolean; endedAt: number; };
+export type EndLevelProps = { 
+  userId: string; // userId used to save play
+  playId: string;  // playId returned from start
+  coins: number; // coins collected by player
+  completed: boolean; // whether player completed level
+  endedAt: number; // ended timestamp (milliseconds) set before request
+};
 export type HandleLevelEndProps = { coins: number; completed: boolean; endedAt: number; };
 
 export async function handleLevelEnd({ coins, completed, endedAt }: HandleLevelEndProps, dbPlay: DBPlay) {
