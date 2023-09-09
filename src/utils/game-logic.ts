@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 const levelConfigs = [
   { // 1-5
     platformType: 0,
@@ -358,49 +360,110 @@ const levelConfigs = [
   }
 ];
 
+function inRange(num: number, min = 0, max = 999) {
+    return ((num > max) ? false : ((num < min) ? false : true)); }
+
 function randomRange(min :number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export type StartLevelProps = { number: number; };
+export type DBPlay = {
+  _id: ObjectId;
+  playId: ObjectId;
+  playerSpeed: number;
+  serverStartedAt: number;
+  clientStartedAt: number;
+  minRunTime: number;
+  maxCoins: number;
+  platformGaps: number[];
+  platformCoins: number[];
+}
+
+export type StartLevelProps = { userId: string; number: number; startedAt: number; };
 export type GeneratedLevelProps = {
+  playId: ObjectId;
   totalPlatformAmount: number;
   playerMovingSpeed: number;
   platformProps: GeneratedPlatformProps[];
 };
 export type GeneratedPlatformProps = {
-  isDistance: boolean;
-  distanceAmount: number;
+  isGap: boolean;
+  gapAmount: number;
   isObstacle: boolean;
   obstacleAmount: number;
   isCoin: boolean;
   coinAmount: number;
 }
 
-export function generateLevelProps({ number }: StartLevelProps) {
-  const config = levelConfigs[Math.floor(number / 5) - 1];
+export async function generateLevelProps(number: number) {
+  const config = levelConfigs[Math.floor(number / 5)];
   const totalPlatformAmount = randomRange(config.minPlatformAmount, config.maxPlatformAmount); // roll for platform amount
   const playerMovingSpeed = randomRange(config.minPlayerMovingSpeed, config.maxPlayerMovingSpeed); // roll for move speed
   const platformProps = [] as GeneratedPlatformProps[];
+  const gaps = [] as number[];
+  const coins = [] as number[];
+  let minRunTime = 0;
+  let maxCoins = 0;
 
   for (let i = 0; i < totalPlatformAmount; i++) {
-    const isDistance = !!(Math.random() <= config.platformDistanceFrequency); // roll for isDistance / DistanceFrequency
-    const distanceAmount = (isDistance) ? randomRange(config.minDistanceAmount, config.maxDistanceAmount) : 0; // roll for DistanceAmount
+    if (i < 2) {
+      gaps.push(0);
+      minRunTime += (10 / playerMovingSpeed); // reduced to add 1 platform of leeway
+      coins.push(0);
+      continue;
+    }
+
+    const isGap = !!(Math.random() <= config.platformDistanceFrequency); // roll for isGap / DistanceFrequency
+    const gapAmount = (isGap) ? randomRange(config.minDistanceAmount, config.maxDistanceAmount) : 0; // roll for DistanceAmount
+    gaps.push(gapAmount);
+    minRunTime += (20 + gapAmount) / playerMovingSpeed;
     const isObstacle = !!(Math.random() <= config.obstacleFrequency); // roll for isObstacle / ObstacleFrequency
     const obstacleAmount = (isObstacle) ? randomRange(config.minObstacleAmount, config.maxObstacleAmount) : 0; // roll for ObstacleAmount
     const isCoin = !!(Math.random() <= config.coinFrequency);
     const coinAmount = (isCoin) ? randomRange(config.minCoinAmount, config.maxCoinAmount) : 0;
+    coins.push(coinAmount);
+    maxCoins += coinAmount;
 
-    platformProps.push({ isDistance, distanceAmount, isObstacle, obstacleAmount, isCoin, coinAmount });
+    platformProps.push({ isGap, gapAmount, isObstacle, obstacleAmount, isCoin, coinAmount });
   }
+  minRunTime = Math.floor(minRunTime * 1000);
+
+  const levelProps: GeneratedLevelProps = { playId: new ObjectId(), totalPlatformAmount, playerMovingSpeed, platformProps };
   
-  return { totalPlatformAmount, playerMovingSpeed, platformProps } as GeneratedLevelProps;
+  return [levelProps, minRunTime, maxCoins, gaps, coins] as const;
 }
 
-export type EndLevelProps = { coins: number; complete: boolean; endedAt: number; };
-export type CompletionProps = {};
+export type EndLevelProps = { userId: string; playId: string; coins: number; completed: boolean; endedAt: number; };
+export type HandleLevelEndProps = { coins: number; completed: boolean; endedAt: number; };
 
-export function handleLevelEnd({ coins, complete, endedAt }: EndLevelProps) {
+export async function handleLevelEnd({ coins, completed, endedAt }: HandleLevelEndProps, dbPlay: DBPlay) {
+  if (coins > dbPlay.maxCoins) throw new Error('Max coins exceeded');
+  else if (endedAt - dbPlay.clientStartedAt < dbPlay.minRunTime) throw new Error('Completed too quickly');
+  const now = Date.now();
+  if (completed) {
+    if (now - dbPlay.serverStartedAt < (dbPlay.minRunTime - 5000)) throw new Error('Completed too early');
+  }
+  else {
+    const timeElapsed = now - dbPlay.serverStartedAt;
+    let currentMinTime = 20 / dbPlay.playerSpeed;
+    let currentMaxCoins = 0;
+    for (let i = 2; i < dbPlay.platformGaps.length; i++) {
+      const [platformDistance, platformCoins] = [(20 + dbPlay.platformGaps[i]), dbPlay.platformCoins[i]];
+      currentMinTime += (platformDistance / dbPlay.playerSpeed) * 1000;
+      currentMaxCoins += platformCoins;
+      if (currentMinTime > timeElapsed) {
+        if (coins > currentMaxCoins) {
+          if (!inRange(now - endedAt, 0, 3500) || !inRange(dbPlay.serverStartedAt - dbPlay.clientStartedAt, 0, 3500)) throw new Error('Timing out of sync');
+          else {
+            const clientTimeElapsed = endedAt - dbPlay.clientStartedAt;
+            if (!inRange(clientTimeElapsed - timeElapsed, 0, 5000)) throw new Error('Session out of sync');
+            else if (currentMinTime > clientTimeElapsed) throw new Error('Coins collected too quickly');
+          }
+        }
+        else break;
+      }
+    }
+  }
   
-  return {} as CompletionProps;
+  return coins;
 }

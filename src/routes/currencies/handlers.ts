@@ -1,7 +1,6 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { GetEquipsProps, RemoveEquipProps, SetEquipProps } from "@assetlayer/sdk/dist/types/equip";
 import { DecreaseCurrencyBalanceProps, GetCurrencyBalanceProps, GetCurrencyProps, GetCurrencySummaryProps, IncreaseCurrencyBalanceProps, TransferCurrencyProps } from "@assetlayer/sdk";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 

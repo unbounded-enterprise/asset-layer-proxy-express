@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { NextFunction, Request, Response } from 'express';
 import { Server } from 'http';
+import { MongoClient } from 'mongodb';
 import { AssetLayer } from '@assetlayer/sdk';
 import appsRouter from './routes/apps/router';
 import assetsRouter from './routes/assets/router';
@@ -9,6 +10,7 @@ import currenciesRouter from './routes/currencies/router';
 import equipsRouter from './routes/equips/router';
 // import expressionsRouter from './routes/expressions/router';
 import listingsRouter from './routes/listings/router';
+import levelsRouter from './routes/levels/router';
 // import magicRouter from './routes/magic/router';
 import slotsRouter from './routes/slots/router';
 import usersRouter from './routes/users/router';
@@ -18,8 +20,11 @@ const validErrorStatusCodes = new Set([400,401,404,406,407,409]);
 const app = express();
 const port = process.env.PORT || 3001;
 const apiRoute = '/api';
+const mep = process.env.MONGO_ENDPOINT || "";
 let server: Server;
 
+const mdb = new MongoClient(mep);
+export const rolltopiaDB = mdb.db('rolltopia');
 export const assetlayer = new AssetLayer({
   appSecret: process.env.ASSETLAYER_APP_SECRET!,
 });
@@ -37,6 +42,7 @@ function errorHandler(e: unknown, req: Request, res: Response, next: NextFunctio
   return res.status(error.status).json({ statusCode, success: false, message });
 }
 
+app.use(express.json());
 app.use(`${apiRoute}/app`, appsRouter);
 app.use(`${apiRoute}/asset`, assetsRouter);
 app.use(`${apiRoute}/collection`, collectionsRouter);
@@ -45,6 +51,7 @@ app.use(`${apiRoute}/equip`, equipsRouter);
 // app.use(`${apiRoute}/expression`, expressionsRouter);
 // app.use(`${apiRoute}/handcash`, handcashRouter);
 app.use(`${apiRoute}/listing`, listingsRouter);
+app.use(`${apiRoute}/level`, levelsRouter);
 // app.use(`${apiRoute}/magic`, magicRouter);
 // app.use(`${apiRoute}/permission`, permissionRouter);
 app.use(`${apiRoute}/slot`, slotsRouter);
