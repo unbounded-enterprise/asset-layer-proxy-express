@@ -206,11 +206,12 @@ export const sendRandomAsset = async (req: SendRandomAssetRequest, res: CustomRe
 type AssetUpdateRequest = Request<{},{},AssetUpdateProps,AssetUpdateProps>;
 export const update = async (req: AssetUpdateRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = formatIncomingHeaders(req.headers);
     const { properties, assetId, assetIds, collectionId } = { ...req.body, ...req.query };
     
     if (!(assetId || assetIds || collectionId)) throw new Error('Missing assetId(s) or collectionId');
 
-    const response = await assetlayer.assets.raw.update({ properties, assetId, assetIds, collectionId });
+    const response = await assetlayer.assets.raw.update({ properties, assetId, assetIds, collectionId }, headers);
 
     return res.json(response);
   }
