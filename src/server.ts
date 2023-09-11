@@ -43,6 +43,10 @@ function errorHandler(e: unknown, req: Request, res: Response, next: NextFunctio
 }
 
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  next();
+});
 app.use(`${apiRoute}/app`, appsRouter);
 app.use(`${apiRoute}/asset`, assetsRouter);
 app.use(`${apiRoute}/collection`, collectionsRouter);
