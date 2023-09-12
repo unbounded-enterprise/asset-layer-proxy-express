@@ -4,6 +4,7 @@ import { getRolltopiaUser, getUser } from './handlers';
 const usersRouter: Router = Router();
 
 usersRouter.get('/info', getUser);
-usersRouter.get('/user', getRolltopiaUser);
+
+usersRouter.post('/user', getRolltopiaUser);
 
 export default usersRouter;
