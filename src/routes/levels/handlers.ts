@@ -5,7 +5,7 @@ import { assetlayer, rolltopiaDB } from "../../server";
 import { ObjectId } from "mongodb";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 
-const rolltopiaCurrencyId = "64f774cb151a6a3dee16df7c";
+export const rolltopiaCurrencyId = "64f774cb151a6a3dee16df7c";
 
 type StartLevelRequest = Request<{},{},StartLevelProps,StartLevelProps>;
 export const start = async (req: StartLevelRequest, res: CustomResponse, next: NextFunction) => {
