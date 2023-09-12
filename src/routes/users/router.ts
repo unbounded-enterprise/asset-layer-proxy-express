@@ -5,6 +5,6 @@ const usersRouter: Router = Router();
 
 usersRouter.get('/info', getUser);
 
-usersRouter.post('/user', getRolltopiaUser);
+usersRouter.post('/', getRolltopiaUser);
 
 export default usersRouter;

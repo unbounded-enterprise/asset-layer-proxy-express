@@ -40,8 +40,9 @@ type GetRolltopiaUserRequest = Request<{},{},GetRolltopiaUserProps,GetRolltopiaU
 export const getRolltopiaUser = async (req: GetRolltopiaUserRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const { userId } = { ...req.body, ...req.query };
+    if (!userId) throw new Error('Missing userId');
+
     let user = await rolltopiaDB.collection('users').findOne({ _id: new ObjectId(userId) });
-    
     if (!user) throw new Error('User not found');
 
     return res.json(user);
