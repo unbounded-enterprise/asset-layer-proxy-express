@@ -446,9 +446,10 @@ export type HandleLevelEndProps = { coins: number; completed: boolean; endedAt: 
 
 export async function handleLevelEnd({ coins, completed, endedAt }: HandleLevelEndProps, dbPlay: DBPlay) {
   if (coins > dbPlay.maxCoins) throw new Error('Max coins exceeded');
-  else if (endedAt - dbPlay.clientStartedAt < dbPlay.minRunTime) throw new Error('Completed too quickly');
+
   const now = Date.now();
   if (completed) {
+    if (endedAt - dbPlay.clientStartedAt < dbPlay.minRunTime) throw new Error('Completed too quickly');
     if (now - dbPlay.serverStartedAt < (dbPlay.minRunTime - 5000)) throw new Error('Completed too early');
   }
   else {
