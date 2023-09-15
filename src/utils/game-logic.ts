@@ -1,3 +1,4 @@
+import { BasicError } from "@assetlayer/sdk";
 import { ObjectId } from "mongodb";
 
 const levelConfigs = [
@@ -373,16 +374,18 @@ export type DBPlay = {
   playerSpeed: number;
   serverStartedAt: number;
   clientStartedAt: number;
+  level: number;
   minRunTime: number;
   maxCoins: number;
   platformGaps: number[];
   platformCoins: number[];
-}
+};
 
-export type StartLevelProps = { 
-  userId: string; // ObjectId used to save play
-  number: number; // level number
-  startedAt: number; // started timestamp (milliseconds) set before request
+export type GeneratedPlatformProps = {
+  isGap: boolean;
+  gapAmount: number;
+  isCoin: boolean;
+  coinAmount: number;
 };
 export type GeneratedLevelProps = {
   playId: ObjectId;
@@ -390,13 +393,6 @@ export type GeneratedLevelProps = {
   playerMovingSpeed: number;
   platformProps: GeneratedPlatformProps[];
 };
-export type GeneratedPlatformProps = {
-  isGap: boolean;
-  gapAmount: number;
-  isCoin: boolean;
-  coinAmount: number;
-}
-
 export async function generateLevelProps(number: number) {
   const config = levelConfigs[Math.floor(number / 5)];
   const totalPlatformAmount = randomRange(config.minPlatformAmount, config.maxPlatformAmount); // roll for platform amount
@@ -436,22 +432,21 @@ export async function generateLevelProps(number: number) {
   return [levelProps, minRunTime, maxCoins, gaps, coins] as const;
 }
 
-export type EndLevelProps = { 
-  userId: string; // userId used to save play
-  playId: string;  // playId returned from start
-  coins: number; // coins collected by player
-  completed: boolean; // whether player completed level
-  endedAt: number; // ended timestamp (milliseconds) set before request
+export type HandleLevelEndProps = { 
+  coins: number;
+  completed: boolean;
+  endedAt: number;
+  adWatched: boolean;
 };
-export type HandleLevelEndProps = { coins: number; completed: boolean; endedAt: number; };
-
-export async function handleLevelEnd({ coins, completed, endedAt }: HandleLevelEndProps, dbPlay: DBPlay) {
+export async function handleLevelEnd({ coins, completed, endedAt, adWatched }: HandleLevelEndProps, dbPlay: DBPlay) {
   if (coins > dbPlay.maxCoins) throw new Error('Max coins exceeded');
 
   const now = Date.now();
+  console.log(`ended[${dbPlay.level}]: ${dbPlay._id.toString()} @${now}//${endedAt}//${now - endedAt}`);
+
   if (completed) {
-    if (endedAt - dbPlay.clientStartedAt < dbPlay.minRunTime) throw new Error('Completed too quickly');
-    if (now - dbPlay.serverStartedAt < (dbPlay.minRunTime - 5000)) throw new Error('Completed too early');
+    if (endedAt - dbPlay.clientStartedAt < dbPlay.minRunTime) throw new BasicError('Completed too quickly', 400);
+    if (now - dbPlay.serverStartedAt < (dbPlay.minRunTime - 5000)) throw new BasicError('Completed too early', 400);
   }
   else {
     const timeElapsed = now - dbPlay.serverStartedAt;
@@ -463,17 +458,19 @@ export async function handleLevelEnd({ coins, completed, endedAt }: HandleLevelE
       currentMaxCoins += platformCoins;
       if (currentMinTime > timeElapsed) {
         if (coins > currentMaxCoins) {
-          if (!inRange(now - endedAt, 0, 3500) || !inRange(dbPlay.serverStartedAt - dbPlay.clientStartedAt, 0, 3500)) throw new Error('Timing out of sync');
+          const clientDifferential = dbPlay.serverStartedAt - dbPlay.clientStartedAt;
+          if (!inRange(clientDifferential, 0, 5000)) throw new BasicError('Start time out of sync', 400);
           else {
-            const clientTimeElapsed = endedAt - dbPlay.clientStartedAt;
-            if (!inRange(clientTimeElapsed - timeElapsed, 0, 5000)) throw new Error('Session out of sync');
-            else if (currentMinTime > clientTimeElapsed) throw new Error('Coins collected too quickly');
+            const clientTimeElapsed = now - dbPlay.clientStartedAt;
+            if (currentMinTime > clientTimeElapsed) throw new BasicError('Coins collected too quickly', 400);
           }
         }
         else break;
       }
     }
   }
+
+  if (adWatched && completed) coins *= 2;
   
   return coins;
 }
