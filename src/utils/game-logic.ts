@@ -410,8 +410,9 @@ export async function generateLevelProps(number: number) {
   for (let i = 0; i < totalPlatformAmount; i++) {
     if (i < 2) {
       gaps.push(0);
-      minRunTime += (10 / playerMovingSpeed); // reduced to add 1 platform of leeway
       coins.push(0);
+      platformProps.push({ isGap: false, gapAmount: 0, isCoin: false, coinAmount: 0 });
+      minRunTime += (10 / playerMovingSpeed); // reduced to add 1 platform of leeway
       continue;
     }
 
