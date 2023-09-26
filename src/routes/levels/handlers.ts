@@ -39,7 +39,7 @@ export type EndLevelProps = {
   coins: number; // coins collected by player
   completed: boolean; // whether player completed level
   endedAt: number; // ended timestamp (milliseconds) set before request
-  adWatched: boolean; // TEMPORARY: whether player watched ad for reward / bonus (completed only)
+  adWatched: boolean; // TEMPORARY: whether player watched ad for bonus (completed only)
 };
 type EndLevelRequest = Request<{},{},EndLevelProps,EndLevelProps>;
 export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextFunction) => {
