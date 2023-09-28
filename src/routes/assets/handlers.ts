@@ -145,9 +145,9 @@ type MintAssetsRequest = Request<{},{},MintAssetsProps,MintAssetsProps>;
 export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { collectionId, number, walletUserId } = { ...req.body, ...req.query };
+    const { collectionId, number, mintTo, walletUserId } = { ...req.body, ...req.query };
 
-    const response = await assetlayer.assets.raw.mintAssets({ collectionId, number, walletUserId }, headers);
+    const response = await assetlayer.assets.raw.mintAssets({ collectionId, number, mintTo, walletUserId }, headers);
 
     return res.json(response);
   }
