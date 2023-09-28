@@ -10,7 +10,7 @@ async function addUserToDB(user?: User) {
 
   try {
     const id = new ObjectId(user.userId);
-    const update = { _id: id, handle: user.handle, email: user.email, lastDailyClaimedAt: 0, consecutiveDailies: 0 };
+    const update = { _id: id, handle: user.handle, email: user.email, lastDailyClaimedAt: 0, consecutiveDailies: 0, levelsCompleted: 0 };
     const result = await rolltopiaDB.collection('users').updateOne({ _id: id }, { $setOnInsert: update }, { upsert: true });
 
     return !!result.upsertedCount;
