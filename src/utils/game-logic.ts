@@ -471,6 +471,11 @@ export async function handleLevelEnd({ coins, completed, endedAt, adWatched }: H
   }
 
   if (adWatched && completed) coins *= 2;
-  
+  if (completed) {
+    coins *= 2;
+  }
+  const levelBonus = 1 + (dbPlay.level / 100); 
+  coins *= levelBonus;
+  coins = Math.round(coins);
   return coins;
 }
