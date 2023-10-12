@@ -1,7 +1,6 @@
 import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { GetEquipsProps, RemoveEquipProps, SetEquipProps } from "@assetlayer/sdk/dist/types/equip";
 import { DecreaseCurrencyBalanceProps, GetCurrencyBalanceProps, GetCurrencyProps, GetCurrencySummaryProps, IncreaseCurrencyBalanceProps, TransferCurrencyProps } from "@assetlayer/sdk";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 
@@ -45,7 +44,8 @@ export const getCurrencySummary = async (req: GetCurrencySummaryRequest, res: Cu
 type IncreaseCurrencyBalanceRequest = Request<{},{},IncreaseCurrencyBalanceProps,IncreaseCurrencyBalanceProps>;
 export const increaseCurrencyBalance = async (req: IncreaseCurrencyBalanceRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const response = await assetlayer.currencies.raw.increaseCurrencyBalance({ ...req.body, ...req.query });
+    const headers = formatIncomingHeaders(req.headers);
+    const response = await assetlayer.currencies.raw.increaseCurrencyBalance({ ...req.body, ...req.query }, headers);
 
     return res.json(response);
   }
@@ -57,7 +57,8 @@ export const increaseCurrencyBalance = async (req: IncreaseCurrencyBalanceReques
 type DecreaseCurrencyBalanceRequest = Request<{},{},DecreaseCurrencyBalanceProps,DecreaseCurrencyBalanceProps>;
 export const decreaseCurrencyBalance = async (req: DecreaseCurrencyBalanceRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const response = await assetlayer.currencies.raw.decreaseCurrencyBalance({ ...req.body, ...req.query });
+    const headers = formatIncomingHeaders(req.headers);
+    const response = await assetlayer.currencies.raw.decreaseCurrencyBalance({ ...req.body, ...req.query }, headers);
 
     return res.json(response);
   }
@@ -69,7 +70,8 @@ export const decreaseCurrencyBalance = async (req: DecreaseCurrencyBalanceReques
 type TransferCurrencyRequest = Request<{},{},TransferCurrencyProps,TransferCurrencyProps>;
 export const transferCurrency = async (req: TransferCurrencyRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const response = await assetlayer.currencies.raw.transferCurrency({ ...req.body, ...req.query });
+    const headers = formatIncomingHeaders(req.headers);
+    const response = await assetlayer.currencies.raw.transferCurrency({ ...req.body, ...req.query }, headers);
 
     return res.json(response);
   }
