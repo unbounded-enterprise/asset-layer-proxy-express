@@ -1,12 +1,12 @@
 {
-  "name": "asset-layer-proxy-express",
+  "name": "rolltopia-server",
   "version": "0.0.01",
   "main": "src/index.ts",
   "description": "",
   "keywords": [],
   "author": "Asset Layer",
   "license": "MIT",
-  "homepage": "https://github.com/unbounded-enterprise/asset-layer-proxy-express#readme",
+  "homepage": "https://rolltopia.games",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/unbounded-enterprise/asset-layer-proxy-express.git"
@@ -22,7 +22,7 @@
     "heroku-postbuild": "npm run build"
   },
   "dependencies": {
-    "@assetlayer/sdk": "^0.0.1-beta.4.6",
+    "@assetlayer/sdk": "^0.0.1-beta.5.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mongodb": "^6.0.0"
