@@ -2,6 +2,7 @@ import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { ActivateCollectionProps, CollectionAssetsProps, CollectionInfoProps, CreateCollectionProps, GetCollectionAssetsProps, UpdateCollectionImageProps, UpdateCollectionProps } from "@assetlayer/sdk/dist/types/collection";
+import { formatIncomingHeaders } from "../../utils/basic-format";
 
 type CollectionInfoRequest = Request<{},{},CollectionInfoProps,CollectionInfoProps>;
 export const info = async (req: CollectionInfoRequest, res: CustomResponse, next: NextFunction) => {
@@ -36,13 +37,14 @@ export const assets = async (req: CollectionAssetsRequest, res: CustomResponse, 
 type CreateCollectionRequest = Request<{},{},CreateCollectionProps,CreateCollectionProps>;
 export const createCollection = async (req: CreateCollectionRequest, res: CustomResponse, next: NextFunction) => {
   try {
+    const headers = formatIncomingHeaders(req.headers);
     const { collectionName, slotId, type, maximum, description, tags, royaltyRecipient, 
       collectionImage, collectionBanner, properties, walletUserId } = { ...req.body, ...req.query };
 
     const response = await assetlayer.collections.raw.createCollection({ 
       collectionName, slotId, type, maximum, description, tags, royaltyRecipient, 
       collectionImage, collectionBanner, properties, walletUserId
-    });
+    }, headers);
 
     return res.json(response);
   }
