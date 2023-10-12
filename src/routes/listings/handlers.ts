@@ -50,9 +50,9 @@ export const collection = async (req: ListingCollectionRequest, res: CustomRespo
 type ListingAppRequest = Request<{},{},ListingAppProps,ListingAppProps>;
 export const app = async (req: ListingAppRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { appId, status, lastUpdatedAt, countsOnly, collectionStats } = { ...req.body, ...req.query };
+    const { appId, status, lastUpdatedAt, countsOnly, collectionStats, includeForeignSlots } = { ...req.body, ...req.query };
 
-    const response = await assetlayer.listings.raw.app({ appId, status, lastUpdatedAt, countsOnly, collectionStats });
+    const response = await assetlayer.listings.raw.app({ appId, status, lastUpdatedAt, countsOnly, collectionStats, includeForeignSlots });
 
     return res.json(response);
   }
@@ -65,11 +65,11 @@ type ListingNewRequest = Request<{},{},ListingNewProps,ListingNewProps>;
 export const newListing = async (req: ListingNewRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { price, assetId, assetIds, collectionId, liveTime, status, walletUserId } = { ...req.body, ...req.query };
+    const { price, currency, currencyId, assetId, assetIds, collectionId, liveTime, status, walletUserId } = { ...req.body, ...req.query };
 
     if (!(assetId || assetIds || collectionId)) throw new Error('Must provide either assetId, assetIds, or collectionId');
 
-    const response = await assetlayer.listings.raw.new({ price, assetId, assetIds, collectionId, liveTime, status, walletUserId }, headers);
+    const response = await assetlayer.listings.raw.new({ price, currency, currencyId, assetId, assetIds, collectionId, liveTime, status, walletUserId }, headers);
 
     return res.json(response);
   }
@@ -82,9 +82,9 @@ type BuyListingRequest = Request<{},{},BuyListingProps,BuyListingProps>;
 export const buyListing = async (req: BuyListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { listingId, price } = { ...req.body, ...req.query };
+    const { listingId, price, currency, currencyId } = { ...req.body, ...req.query };
 
-    const response = await assetlayer.listings.raw.buyListing({ listingId, price }, headers);
+    const response = await assetlayer.listings.raw.buyListing({ listingId, price, currency, currencyId }, headers);
 
     return res.json(response);
   }
@@ -97,9 +97,9 @@ type UpdateListingRequest = Request<{},{},UpdateListingProps,UpdateListingProps>
 export const updateListing = async (req: UpdateListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { listingId, price, liveTime, status, walletUserId } = { ...req.body, ...req.query };
+    const { listingId, price, currency, currencyId, liveTime, status, walletUserId } = { ...req.body, ...req.query };
 
-    const response = await assetlayer.listings.raw.updateListing({ listingId, price, liveTime, status, walletUserId }, headers);
+    const response = await assetlayer.listings.raw.updateListing({ listingId, price, currency, currencyId, liveTime, status, walletUserId }, headers);
 
     return res.json(response);
   }
