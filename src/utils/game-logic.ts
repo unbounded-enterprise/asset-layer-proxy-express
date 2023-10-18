@@ -472,7 +472,7 @@ export async function handleLevelEnd({ coins, completed, endedAt, adWatched }: H
 
   if (adWatched && completed) coins *= 2;
   if (completed) {
-    coins *= 2;
+    coins += 50;
   }
   const levelBonus = 1 + (dbPlay.level / 100); 
   coins *= levelBonus;
