@@ -4,6 +4,8 @@ import { DBPlay, generateLevelProps, handleLevelEnd } from "../../utils/game-log
 import { assetlayer, rolltopiaDB } from "../../server";
 import { ObjectId } from "mongodb";
 import { formatIncomingHeaders } from "../../utils/basic-format";
+import { DBPlayHelix, generateLevelPropsHelix, handleLevelEndHelix } from "../../utils/game-logic-helix";
+import { RolltopiaUser } from "../users/handlers";
 
 export const rolltopiaCurrencyId = "64f774cb151a6a3dee16df7c";
 
@@ -55,6 +57,61 @@ export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextF
     const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
 
     await rolltopiaDB.collection('plays').deleteOne({ _id: dbPlay._id });
+
+    return res.json({ statusCode: 200, success: true, body: { balance } });
+  }
+  catch (e) {
+    return next(e);
+  }
+}
+
+
+export const startHelix = async (req: StartLevelRequest, res: CustomResponse, next: NextFunction) => {
+  try {
+    const headers = formatIncomingHeaders(req.headers);
+    const now = Date.now();
+    const { userId, number, startedAt } = { ...req.body, ...req.query };
+    console.log(`helix-started[${number}]: ${userId} @${now}//${startedAt}//${now - startedAt}`);
+    if (number > 100) throw new BasicError('Max level is 100', 400);
+
+    const [levelProps, minRunTime, maxCoins, helixCoins] = await generateLevelPropsHelix(number);
+    const dbPlay = { _id: new ObjectId(userId), playId: levelProps.playId, fallingSpeed: levelProps.fallingSpeed, serverStartedAt: now, clientStartedAt: startedAt, level: number, minRunTime, maxCoins, helixCoins };
+    
+    await rolltopiaDB.collection('plays-helix').replaceOne({ _id: dbPlay._id }, dbPlay, { upsert: true }); 
+
+    return res.json({ statusCode: 200, success: true, body: levelProps });
+  }
+  catch (e) {
+    return next(e);
+  }
+}
+
+export type HelixLimiter = {
+  _id: ObjectId;
+  lastPlays: {
+    duration: number;
+    earned: number;
+  }[];
+}
+export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: NextFunction) => {
+  try {
+    const headers = formatIncomingHeaders(req.headers);
+    const { userId, playId, coins, completed, endedAt, adWatched } = { ...req.body, ...req.query };
+    const userOId = new ObjectId(userId);
+    const [dbPlay, dbLimiter] = (await Promise.all([
+      rolltopiaDB.collection('plays-helix').findOne({ _id: userOId }), 
+      rolltopiaDB.collection('limiter-helix').findOne({ _id: userOId })
+    ])) as [DBPlayHelix | null, HelixLimiter | null];
+
+    if (!dbPlay) throw new BasicError('Play not found', 404);
+    else if (dbPlay.playId.toString() !== playId) throw new BasicError('Play ID mismatch', 400);
+
+    let rewardAmount = await handleLevelEndHelix({ coins, completed, endedAt }, dbPlay);
+    if (adWatched && completed) rewardAmount *= 2;
+    
+    const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
+
+    await rolltopiaDB.collection('plays-helix').deleteOne({ _id: dbPlay._id });
 
     return res.json({ statusCode: 200, success: true, body: { balance } });
   }
