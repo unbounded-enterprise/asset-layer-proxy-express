@@ -58,7 +58,7 @@ export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextF
 
     await rolltopiaDB.collection('plays').deleteOne({ _id: dbPlay._id });
 
-    return res.json({ statusCode: 200, success: true, body: { balance } });
+    return res.json({ statusCode: 200, success: true, body: { balance, rewardAmount } });
   }
   catch (e) {
     return next(e);
@@ -89,10 +89,33 @@ export const startHelix = async (req: StartLevelRequest, res: CustomResponse, ne
 export type HelixLimiter = {
   _id: ObjectId;
   lastPlays: {
-    duration: number;
+    start: number;
     earned: number;
   }[];
 }
+
+const oneHourMS = 1000 * 60 * 60;
+const coinsPerHour = 1000;
+function getCoinLimit(start: number, earned: number, limiter: HelixLimiter | null) {
+  if (!limiter || limiter.lastPlays.length < 10) return 0;
+
+  const now = Date.now();
+  const elapsed = now - limiter.lastPlays[0].start;
+  if (elapsed > oneHourMS) return 0;
+  
+  const playDuration = now - start;
+  const limited = Math.round((coinsPerHour * (playDuration / oneHourMS)) * playDuration);
+  if (earned <= limited) return 0;
+
+  const coinsEarned = limiter.lastPlays.reduce((acc, curr) => acc + curr.earned, 0) + earned;
+  const maxEarnings = coinsPerHour * (elapsed / oneHourMS);
+  if (coinsEarned <= maxEarnings) return 0;
+
+  console.log('Coins Limited:', limited)
+
+  return limited;
+}
+
 export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
@@ -106,14 +129,24 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     if (!dbPlay) throw new BasicError('Play not found', 404);
     else if (dbPlay.playId.toString() !== playId) throw new BasicError('Play ID mismatch', 400);
 
-    let rewardAmount = await handleLevelEndHelix({ coins, completed, endedAt }, dbPlay);
-    if (adWatched && completed) rewardAmount *= 2;
+    const coinsEarned = await handleLevelEndHelix({ coins, completed, endedAt }, dbPlay);
+    let multiplier = 1 + (dbPlay.level / 100);
+    if (adWatched && completed) multiplier *= 2;
+    const coinLimit = getCoinLimit(dbPlay.serverStartedAt, coinsEarned, dbLimiter);
+    const coinBase = coinLimit || coinsEarned;
+    const rewardAmount = Math.round(((completed) ? coinBase + 50 : coinBase) * multiplier);
     
     const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
+    const updatedLimiter = { lastPlays: dbLimiter?.lastPlays || [] };
+    if (updatedLimiter.lastPlays.length >= 10) updatedLimiter.lastPlays.shift();
+    updatedLimiter.lastPlays.push({ start: dbPlay.serverStartedAt, earned: coinsEarned });
 
-    await rolltopiaDB.collection('plays-helix').deleteOne({ _id: dbPlay._id });
+    await Promise.all([
+      rolltopiaDB.collection('plays-helix').deleteOne({ _id: dbPlay._id }),
+      rolltopiaDB.collection('limiter-helix').updateOne({ _id: userOId }, { $set: updatedLimiter }, { upsert: true })
+    ]);
 
-    return res.json({ statusCode: 200, success: true, body: { balance } });
+    return res.json({ statusCode: 200, success: true, body: { balance, rewardAmount } });
   }
   catch (e) {
     return next(e);
