@@ -1,6 +1,8 @@
 import { BasicError } from "@assetlayer/sdk";
 import { ObjectId } from "mongodb";
+import { inRange, randomRange } from "./basic-math";
 
+const defaultPlatformBoundsZ = 20;
 const levelConfigs = [
   { // 1-5
     platformType: 0,
@@ -361,13 +363,6 @@ const levelConfigs = [
   }
 ];
 
-function inRange(num: number, min = 0, max = 999) {
-    return ((num > max) ? false : ((num < min) ? false : true)); }
-
-function randomRange(min :number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 export type DBPlay = {
   _id: ObjectId;
   playId: ObjectId;
@@ -389,8 +384,8 @@ export type GeneratedPlatformProps = {
 };
 export type GeneratedLevelProps = {
   playId: ObjectId;
-  totalPlatformAmount: number;
   playerMovingSpeed: number;
+  totalPlatformAmount: number;
   platformProps: GeneratedPlatformProps[];
 };
 export async function generateLevelProps(number: number) {
@@ -408,14 +403,14 @@ export async function generateLevelProps(number: number) {
       gaps.push(0);
       coins.push(0);
       platformProps.push({ isGap: false, gapAmount: 0, isCoin: false, coinAmount: 0 });
-      minRunTime += (10 / playerMovingSpeed); // reduced to add 1 platform of leeway
+      minRunTime += ((defaultPlatformBoundsZ / 2) / playerMovingSpeed); // reduced to add 1 platform of leeway
       continue;
     }
 
     const isGap = !!(Math.random() <= config.platformDistanceFrequency); // roll for isGap / DistanceFrequency
     const gapAmount = (isGap) ? randomRange(config.minDistanceAmount, config.maxDistanceAmount) : 0; // roll for DistanceAmount
     gaps.push(gapAmount);
-    minRunTime += (20 + gapAmount) / playerMovingSpeed;
+    minRunTime += (defaultPlatformBoundsZ + gapAmount) / playerMovingSpeed;
     // const isObstacle = !!(Math.random() <= config.obstacleFrequency); // roll for isObstacle / ObstacleFrequency
     // const obstacleAmount = randomRange(config.minObstacleAmount, config.maxObstacleAmount); // roll for ObstacleAmount
     const isCoin = !!(Math.random() <= config.coinFrequency);
@@ -450,10 +445,10 @@ export async function handleLevelEnd({ coins, completed, endedAt, adWatched }: H
   }
   else {
     const timeElapsed = now - dbPlay.serverStartedAt;
-    let currentMinTime = 20 / dbPlay.playerSpeed;
+    let currentMinTime = (defaultPlatformBoundsZ / dbPlay.playerSpeed) * 1000;
     let currentMaxCoins = 0;
     for (let i = 2; i < dbPlay.platformGaps.length; i++) {
-      const [platformDistance, platformCoins] = [(20 + dbPlay.platformGaps[i]), dbPlay.platformCoins[i]];
+      const [platformDistance, platformCoins] = [(defaultPlatformBoundsZ + dbPlay.platformGaps[i]), dbPlay.platformCoins[i]];
       currentMinTime += (platformDistance / dbPlay.playerSpeed) * 1000;
       currentMaxCoins += platformCoins;
       if (currentMinTime > timeElapsed) {

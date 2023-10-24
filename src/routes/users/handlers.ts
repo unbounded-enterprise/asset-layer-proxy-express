@@ -3,7 +3,7 @@ import { assetlayer, rolltopiaDB } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { User } from "@assetlayer/sdk";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 
 async function addUserToDB(user?: User) {
   if (!user) return false;
@@ -13,6 +13,7 @@ async function addUserToDB(user?: User) {
     const update = { 
       _id: id, handle: user.handle, email: user.email, 
       lastDailyClaimedAt: 0, consecutiveDailies: 0, levelsCompleted: 0,
+      lastHelixDailyClaimedAt: 0, consecutiveHelixDailies: 0, helixLevelsCompleted: 0,
       initialRollieClaimed: false,
     };
     const result = await rolltopiaDB.collection('users').updateOne({ _id: id }, { $setOnInsert: update }, { upsert: true });
@@ -39,6 +40,18 @@ export const getUser = async (req: GetUserRequest, res: CustomResponse, next: Ne
   }
 }
 
+export type RolltopiaUser = {
+  _id: ObjectId;
+  handle: string;
+  email: string;
+  lastDailyClaimedAt: number;
+  consecutiveDailies: number;
+  levelsCompleted: number;
+  lastHelixDailyClaimedAt: number;
+  consecutiveHelixDailies: number;
+  helixLevelsCompleted: number;
+  initialRollieClaimed: boolean;
+}
 type GetRolltopiaUserProps = { userId: string; };
 type GetRolltopiaUserRequest = Request<{},{},GetRolltopiaUserProps,GetRolltopiaUserProps>;
 export const getRolltopiaUser = async (req: GetRolltopiaUserRequest, res: CustomResponse, next: NextFunction) => {
