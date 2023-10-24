@@ -8,10 +8,6 @@ export function formatIncomingHeaders(headers?: IncomingHttpHeaders) {
     
     if (headers.didtoken) head.didtoken = headers.didtoken as string;
 
-    for (const [key, value] of Object.entries(headers)) {
-        console.log('header:', key, value);
-    }
-
     return head;
 }
 
