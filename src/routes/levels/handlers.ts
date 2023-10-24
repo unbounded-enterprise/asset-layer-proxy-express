@@ -95,7 +95,7 @@ export type HelixLimiter = {
 }
 
 const oneHourMS = 1000 * 60 * 60;
-const coinsPerHour = 1000;
+const coinsPerHour = 8000;
 function getCoinLimit(start: number, earned: number, limiter: HelixLimiter | null) {
   if (!limiter || limiter.lastPlays.length < 10) return 0;
 
@@ -104,7 +104,7 @@ function getCoinLimit(start: number, earned: number, limiter: HelixLimiter | nul
   if (elapsed > oneHourMS) return 0;
   
   const playDuration = now - start;
-  const limited = Math.round((coinsPerHour * (playDuration / oneHourMS)) * playDuration);
+  const limited = Math.round(coinsPerHour * (playDuration / oneHourMS));
   if (earned <= limited) return 0;
 
   const coinsEarned = limiter.lastPlays.reduce((acc, curr) => acc + curr.earned, 0) + earned;

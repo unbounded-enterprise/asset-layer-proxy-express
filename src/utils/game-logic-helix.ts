@@ -933,7 +933,7 @@ export async function handleLevelEndHelix({ coins, completed, endedAt }: HandleL
   if (coins > dbPlay.maxCoins) throw new Error('Max coins exceeded');
 
   const now = Date.now();
-  console.log(`ended[${dbPlay.level}]: ${dbPlay._id.toString()} @${now}//${endedAt}//${now - endedAt}`);
+  console.log(`helix-ended[${dbPlay.level}]: ${dbPlay._id.toString()} @${now}//${endedAt}//${now - endedAt}`);
 
   if (completed) {
     if (endedAt - dbPlay.clientStartedAt < dbPlay.minRunTime) throw new BasicError('Completed too quickly', 400);
@@ -941,7 +941,7 @@ export async function handleLevelEndHelix({ coins, completed, endedAt }: HandleL
   }
   else {
     const timeElapsed = now - dbPlay.serverStartedAt;
-    let currentMinTime = (defaultHelixDistance / dbPlay.fallingSpeed) * 1000;
+    let currentMinTime = 0;
     let currentMaxCoins = 0;
     for (let i = 0; i < dbPlay.helixCoins.length; i++) {
       const helixCoins = dbPlay.helixCoins[i];
