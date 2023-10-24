@@ -58,7 +58,7 @@ export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextF
 
     await rolltopiaDB.collection('plays').deleteOne({ _id: dbPlay._id });
 
-    return res.json({ statusCode: 200, success: true, body: { balance, rewardAmount } });
+    return res.json({ statusCode: 200, success: true, body: { balance } });
   }
   catch (e) {
     return next(e);
@@ -132,9 +132,9 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     const coinsEarned = await handleLevelEndHelix({ coins, completed, endedAt }, dbPlay);
     let multiplier = 1 + (dbPlay.level / 100);
     if (adWatched && completed) multiplier *= 2;
-    const coinLimit = getCoinLimit(dbPlay.serverStartedAt, coinsEarned, dbLimiter);
-    const coinBase = coinLimit || coinsEarned;
-    const rewardAmount = Math.round(((completed) ? coinBase + 50 : coinBase) * multiplier);
+    const coinsLimit = getCoinLimit(dbPlay.serverStartedAt, coinsEarned, dbLimiter);
+    const coinsBase = coinsLimit || coinsEarned;
+    const rewardAmount = Math.round(((completed) ? coinsBase + 50 : coinsBase) * multiplier);
     
     const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
     const updatedLimiter = { lastPlays: dbLimiter?.lastPlays || [] };
@@ -146,7 +146,7 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
       rolltopiaDB.collection('limiter-helix').updateOne({ _id: userOId }, { $set: updatedLimiter }, { upsert: true })
     ]);
 
-    return res.json({ statusCode: 200, success: true, body: { balance, rewardAmount } });
+    return res.json({ statusCode: 200, success: true, body: { balance, coinsBase, coinsLimit, rewardAmount } });
   }
   catch (e) {
     return next(e);
