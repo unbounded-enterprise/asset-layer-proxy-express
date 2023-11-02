@@ -8,6 +8,163 @@ import { DBPlayHelix, generateLevelPropsHelix, handleLevelEndHelix } from "../..
 import { RolltopiaUser } from "../users/handlers";
 
 export const rolltopiaCurrencyId = "64f774cb151a6a3dee16df7c";
+const RolltopiaAchievements = [
+  {
+    name: "Discover New Rollies",
+    type: "tiered",
+    app: "Rolltopia",
+    tiers: [
+      { 
+        rarity: "common",
+        description: "Discover 2 total rollie breeds",
+        neededValue: 2,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 2500 },
+      },
+      { 
+        rarity: "uncommon",
+        description: "Discover 5 total rollie breeds",
+        neededValue: 5,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 5000 },
+      },
+      { 
+        rarity: "rare",
+        description: "Discover 10 total rollie breeds",
+        neededValue: 10,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 10000 },
+      },
+      { 
+        rarity: "epic",
+        description: "Discover 20 total rollie breeds",
+        neededValue: 20,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 25000 },
+      },
+      { 
+        rarity: "legendary",
+        description: "Discover all rollie breeds",
+        neededValue: 30,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 50000 },
+      },
+    ]
+  },
+  {
+    name: "Create New Rollies",
+    type: "tiered",
+    app: "Rolltopia",
+    Tiers: [
+      { 
+        rarity: "common",
+        description: "Create a rollie using a creation crystals",
+        neededValue: 1,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 2500 },
+      },
+      { 
+        rarity: "uncommon",
+        description: "Create 5 rollies using creation crystals",
+        neededValue: 5,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 5000 },
+      },
+      { 
+        rarity: "rare",
+        description: "Create 10 rollies using creation crystals",
+        neededValue: 10,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 10000 },
+      },
+      { 
+        rarity: "epic",
+        description: "Create 25 rollies using creation crystals",
+        neededValue: 25,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 25000 },
+      },
+      { 
+        rarity: "legendary",
+        description: "Create 50 rollies using creation crystals",
+        neededValue: 50,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 50000 },
+      },
+    ]
+  }
+];
+
+const RunwayRollerAchievements = [
+  {
+    name: "Runway Roller Levels",
+    type: "tiered",
+    app: "Runway Roller",
+    tiers: [
+      { 
+        rarity: "common",
+        description: "Beat level 1 of Runway Roller",
+        neededValue: 1,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 2500 },
+      },
+      { 
+        rarity: "uncommon",
+        description: "Beat level 10 of Runway Roller",
+        neededValue: 10,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 5000 },
+      },
+      { 
+        rarity: "rare",
+        description: "Beat level 25 of Runway Roller",
+        neededValue: 25,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 10000 },
+      },
+      { 
+        rarity: "epic",
+        description: "Beat level 50 of Runway Roller",
+        neededValue: 50,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 25000 },
+      },
+      { 
+        rarity: "legendary",
+        description: "Beat level 100 of Runway Roller",
+        neededValue: 100,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 50000 },
+      },
+    ]
+  },
+];
+
+const RollieJumpAchievements = [
+  {
+    name: "Rollie Jump Levels",
+    type: "tiered",
+    app: "Rollie Jump",
+    tiers: [
+      { 
+        rarity: "common",
+        description: "Beat level 1 of Rollie Jump",
+        neededValue: 1,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 2500 },
+      },
+      { 
+        rarity: "uncommon",
+        description: "Beat level 10 of Rollie Jump",
+        neededValue: 10,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 5000 },
+      },
+      { 
+        rarity: "rare",
+        description: "Beat level 25 of Rollie Jump",
+        neededValue: 25,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 10000 },
+      },
+      { 
+        rarity: "epic",
+        description: "Beat level 50 of Rollie Jump",
+        neededValue: 50,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 25000 },
+      },
+      { 
+        rarity: "legendary",
+        description: "Beat level 100 of Rollie Jump",
+        neededValue: 100,
+        reward: { currencyId: rolltopiaCurrencyId, amount: 50000 },
+      },
+    ]
+  },
+];
+    
 
 export type StartLevelProps = { 
   userId: string; // ObjectId used to save play
