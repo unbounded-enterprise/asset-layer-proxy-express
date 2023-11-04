@@ -8,6 +8,24 @@ import { DBPlayHelix, generateLevelPropsHelix, handleLevelEndHelix } from "../..
 import { RolltopiaUser } from "../users/handlers";
 
 export const rolltopiaCurrencyId = "64f774cb151a6a3dee16df7c";
+export const defaultRolltopiaAchievements = {
+  "Discover New Rollies": {
+    value: 0,
+    // claimed: "",
+  },
+  "Create New Rollies": {
+    value: 0,
+    // claimed: "",
+  },
+  "Runway Roller Levels": {
+    value: 0,
+    // claimed: "",
+  },
+  "Rollie Jump Levels": {
+    value: 0,
+    // claimed: "",
+  },
+}
 const RolltopiaAchievements = [
   {
     name: "Discover New Rollies",
@@ -205,15 +223,24 @@ export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextF
   try {
     const headers = formatIncomingHeaders(req.headers);
     const { userId, playId, coins, completed, endedAt, adWatched } = { ...req.body, ...req.query };
-    const dbPlay = (await rolltopiaDB.collection('plays').findOne({ _id: new ObjectId(userId) })) as DBPlay | null;
+    const [dbUser, dbPlay] = await Promise.all([
+      (completed) ? rolltopiaDB.collection('users').findOne({ _id: new ObjectId(userId) }) : null,
+      rolltopiaDB.collection('plays').findOne({ _id: new ObjectId(userId) })
+    ]) as [RolltopiaUser | null, DBPlay | null];
 
-    if (!dbPlay) throw new BasicError('Play not found', 404);
+    if (completed && !dbUser) throw new BasicError('User not found', 404);
+    else if (!dbPlay) throw new BasicError('Play not found', 404);
     else if (dbPlay.playId.toString() !== playId) throw new BasicError('Play ID mismatch', 400);
 
     const rewardAmount = await handleLevelEnd({ coins, completed, endedAt, adWatched }, dbPlay);
     const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
 
-    await rolltopiaDB.collection('plays').deleteOne({ _id: dbPlay._id });
+    await Promise.all([
+      (completed && dbUser!.achievements["Runway Roller Levels"].value < dbPlay.level) ? 
+        rolltopiaDB.collection('users').updateOne({ _id: new ObjectId(userId) }, { $set: { [`achievements.Runway Roller Levels.value`]: dbPlay.level } }) 
+        : null,
+      rolltopiaDB.collection('plays').deleteOne({ _id: dbPlay._id })
+    ]);
 
     return res.json({ statusCode: 200, success: true, body: { balance } });
   }
@@ -278,12 +305,14 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     const headers = formatIncomingHeaders(req.headers);
     const { userId, playId, coins, completed, endedAt, adWatched } = { ...req.body, ...req.query };
     const userOId = new ObjectId(userId);
-    const [dbPlay, dbLimiter] = (await Promise.all([
+    const [dbUser, dbPlay, dbLimiter] = (await Promise.all([
+      (completed) ? rolltopiaDB.collection('users').findOne({ _id: userOId }) : null,
       rolltopiaDB.collection('plays-helix').findOne({ _id: userOId }), 
       rolltopiaDB.collection('limiter-helix').findOne({ _id: userOId })
-    ])) as [DBPlayHelix | null, HelixLimiter | null];
+    ])) as [RolltopiaUser | null, DBPlayHelix | null, HelixLimiter | null];
 
-    if (!dbPlay) throw new BasicError('Play not found', 404);
+    if (completed && !dbUser) throw new BasicError('User not found', 404);
+    else if (!dbPlay) throw new BasicError('Play not found', 404);
     else if (dbPlay.playId.toString() !== playId) throw new BasicError('Play ID mismatch', 400);
 
     const coinsEarned = await handleLevelEndHelix({ coins, completed, endedAt }, dbPlay);
@@ -299,6 +328,9 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     updatedLimiter.lastPlays.push({ start: dbPlay.serverStartedAt, earned: coinsEarned });
 
     await Promise.all([
+      (completed && dbUser!.achievements["Rollie Jump"].value < dbPlay.level) ? 
+        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Rollie Jump.value`]: dbPlay.level } }) 
+        : null,
       rolltopiaDB.collection('plays-helix').deleteOne({ _id: dbPlay._id }),
       rolltopiaDB.collection('limiter-helix').updateOne({ _id: userOId }, { $set: updatedLimiter }, { upsert: true })
     ]);
