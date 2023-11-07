@@ -7,9 +7,7 @@ import { ObjectId, WithId } from "mongodb";
 import { defaultRolltopiaAchievements } from "../levels/handlers";
 
 async function getDBUser(id: ObjectId) {
-  const user = await rolltopiaDB.collection('users').findOne({ _id: id });
-
-  return user;
+  return await rolltopiaDB.collection('users').findOne({ _id: id });
 }
 
 async function addUserToDB(user?: User) {
@@ -17,11 +15,13 @@ async function addUserToDB(user?: User) {
 
   try {
     const id = new ObjectId(user.userId);
+    const now = Date.now();
     const update = { 
       _id: id, handle: user.handle, email: user.email, 
       initialRollieClaimed: false, rollidex: {}, achievements: {},
       lastDailyClaimedAt: 0, consecutiveDailies: 0,
       lastHelixDailyClaimedAt: 0, consecutiveHelixDailies: 0,
+      createdAt: now, updatedAt: now,
     };
     const result = await rolltopiaDB.collection('users').updateOne({ _id: id }, { $setOnInsert: update }, { upsert: true });
 
@@ -71,11 +71,13 @@ export type RolltopiaUser = {
   email: string;
   initialRollieClaimed: boolean;
   rollidex: BasicObject<boolean>;
+  achievements: BasicAnyObject;
   lastDailyClaimedAt: number;
   consecutiveDailies: number;
   lastHelixDailyClaimedAt: number;
   consecutiveHelixDailies: number;
-  achievements: BasicAnyObject;
+  createdAt: number;
+  updatedAt: number;
 }
 type GetRolltopiaUserProps = { userId: string; };
 type GetRolltopiaUserRequest = Request<{},{},GetRolltopiaUserProps,GetRolltopiaUserProps>;
