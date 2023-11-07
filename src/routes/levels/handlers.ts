@@ -328,8 +328,8 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     updatedLimiter.lastPlays.push({ start: dbPlay.serverStartedAt, earned: coinsEarned });
 
     await Promise.all([
-      (completed && dbUser!.achievements["Rollie Jump"].value < dbPlay.level) ? 
-        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Rollie Jump.value`]: dbPlay.level } }) 
+      (completed && dbUser!.achievements["Rollie Jump Levels"].value < dbPlay.level) ? 
+        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Rollie Jump Levels.value`]: dbPlay.level } }) 
         : null,
       rolltopiaDB.collection('plays-helix').deleteOne({ _id: dbPlay._id }),
       rolltopiaDB.collection('limiter-helix').updateOne({ _id: userOId }, { $set: updatedLimiter }, { upsert: true })
