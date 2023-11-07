@@ -8,7 +8,7 @@ import { DBPlayHelix, generateLevelPropsHelix, handleLevelEndHelix } from "../..
 import { RolltopiaUser } from "../users/handlers";
 
 export const rolltopiaCurrencyId = "64f774cb151a6a3dee16df7c";
-
+    
 export type StartLevelProps = { 
   userId: string; // ObjectId used to save play
   number: number; // level number
@@ -48,15 +48,28 @@ export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextF
   try {
     const headers = formatIncomingHeaders(req.headers);
     const { userId, playId, coins, completed, endedAt, adWatched } = { ...req.body, ...req.query };
-    const dbPlay = (await rolltopiaDB.collection('plays').findOne({ _id: new ObjectId(userId) })) as DBPlay | null;
+    const userOId = new ObjectId(userId);
+    const [dbUser, dbPlay] = await Promise.all([
+      (completed) ? rolltopiaDB.collection('users').findOne({ _id: userOId }) : null,
+      rolltopiaDB.collection('plays').findOne({ _id: userOId })
+    ]) as [RolltopiaUser | null, DBPlay | null];
 
-    if (!dbPlay) throw new BasicError('Play not found', 404);
+    if (completed && !dbUser) throw new BasicError('User not found', 404);
+    else if (!dbPlay) throw new BasicError('Play not found', 404);
     else if (dbPlay.playId.toString() !== playId) throw new BasicError('Play ID mismatch', 400);
 
     const rewardAmount = await handleLevelEnd({ coins, completed, endedAt, adWatched }, dbPlay);
     const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
+    const isNewLevel = ((completed && dbPlay.level <= 100 && dbUser) && (!dbUser.achievements["Runway Roller Levels"] || dbUser.achievements["Runway Roller Levels"].value < dbPlay.level));
 
-    await rolltopiaDB.collection('plays').deleteOne({ _id: dbPlay._id });
+    await Promise.all([
+      (!isNewLevel) ? null : ((!dbUser.achievements["Runway Roller Levels"]) ? (
+        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Runway Roller Levels`]: { value: dbPlay.level, nextClaim: "common" } } })
+      ) : (
+        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Runway Roller Levels.value`]: dbPlay.level } })
+      )),
+      rolltopiaDB.collection('plays').deleteOne({ _id: dbPlay._id })
+    ]);
 
     return res.json({ statusCode: 200, success: true, body: { balance } });
   }
@@ -94,6 +107,14 @@ export type HelixLimiter = {
   }[];
 }
 
+function calculateRewardMultiplier(level: number, completed: boolean, adWatched: boolean) {
+  let multiplier = 1 + (level / 100);
+
+  if (adWatched && completed) multiplier *= 2;
+
+  return multiplier;
+}
+
 const oneHourMS = 1000 * 60 * 60;
 const coinsPerHour = 8000;
 function getCoinLimit(start: number, earned: number, limiter: HelixLimiter | null) {
@@ -121,20 +142,22 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     const headers = formatIncomingHeaders(req.headers);
     const { userId, playId, coins, completed, endedAt, adWatched } = { ...req.body, ...req.query };
     const userOId = new ObjectId(userId);
-    const [dbPlay, dbLimiter] = (await Promise.all([
+    const [dbUser, dbPlay, dbLimiter] = (await Promise.all([
+      (completed) ? rolltopiaDB.collection('users').findOne({ _id: userOId }) : null,
       rolltopiaDB.collection('plays-helix').findOne({ _id: userOId }), 
       rolltopiaDB.collection('limiter-helix').findOne({ _id: userOId })
-    ])) as [DBPlayHelix | null, HelixLimiter | null];
+    ])) as [RolltopiaUser | null, DBPlayHelix | null, HelixLimiter | null];
 
-    if (!dbPlay) throw new BasicError('Play not found', 404);
+    if (completed && !dbUser) throw new BasicError('User not found', 404);
+    else if (!dbPlay) throw new BasicError('Play not found', 404);
     else if (dbPlay.playId.toString() !== playId) throw new BasicError('Play ID mismatch', 400);
 
     const coinsEarned = await handleLevelEndHelix({ coins, completed, endedAt }, dbPlay);
-    let multiplier = 1 + (dbPlay.level / 100);
-    if (adWatched && completed) multiplier *= 2;
+    const multiplier = calculateRewardMultiplier(dbPlay.level, completed, adWatched);
     const coinsLimit = getCoinLimit(dbPlay.serverStartedAt, coinsEarned, dbLimiter);
     const coinsBase = coinsLimit || coinsEarned;
     const rewardAmount = Math.round(((completed) ? coinsBase + 50 : coinsBase) * multiplier);
+    const isNewLevel = ((completed && dbPlay.level <= 100 && dbUser) && (!dbUser.achievements["Rollie Jump Levels"] || dbUser.achievements["Rollie Jump Levels"].value < dbPlay.level));
     
     const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
     const updatedLimiter = { lastPlays: dbLimiter?.lastPlays || [] };
@@ -142,6 +165,11 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     updatedLimiter.lastPlays.push({ start: dbPlay.serverStartedAt, earned: coinsEarned });
 
     await Promise.all([
+      (!isNewLevel) ? null : ((!dbUser.achievements["Rollie Jump Levels"]) ? (
+        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Rollie Jump Levels`]: { value: dbPlay.level, nextClaim: "common" } } })
+      ) : (
+        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Rollie Jump Levels.value`]: dbPlay.level } })
+      )),
       rolltopiaDB.collection('plays-helix').deleteOne({ _id: dbPlay._id }),
       rolltopiaDB.collection('limiter-helix').updateOne({ _id: userOId }, { $set: updatedLimiter }, { upsert: true })
     ]);

@@ -1,9 +1,54 @@
 import { Request, NextFunction } from "express";
-import { assetlayer } from "../../server";
+import { assetlayer, rolltopiaDB } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { AssetInfoProps, AssetSendProps, AssetUpdateProps, AssetUserProps, GetAssetHistoryProps, GetAssetOwnershipHistoryProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
+import { AssetCounts, AssetInfoProps, AssetSendProps, AssetUpdateProps, AssetUserProps, GetAssetHistoryProps, GetAssetOwnershipHistoryProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
 import { IncomingHttpHeaders } from "http";
 import { formatIncomingHeaders } from "../../utils/basic-format";
+import { BasicObject } from "@assetlayer/sdk";
+import { RolltopiaUser, getRolltopiaUserInternal } from "../users/handlers";
+import { ObjectId } from "mongodb";
+
+export const rolliesSlotId = "651edf58aa4c0d48a4fe2c2c";
+
+async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string>) {
+  if (!headers?.didtoken) return;
+  else if (!data) return;
+
+  let rollieKeys = Object.keys(data);
+  if (!rollieKeys.length) return;
+
+  const { result: user, error } = await assetlayer.users.safe.getUser(headers);
+  if (!user) { 
+    console.error(error);
+    return;
+  }
+  const userOId = new ObjectId(user.userId);
+  const { result: rolltopiaUser, error: error2 } = await getRolltopiaUserInternal(userOId);
+  if (!rolltopiaUser) {
+    console.error(error2);
+    return;
+  }
+  else if (rolltopiaUser.achievements['Discover New Rollies']?.nextClaim === 'all') return;
+
+  let dbUpdate: BasicObject<any> | undefined = undefined;
+  rollieKeys = [...(new Set(rollieKeys))];
+  for (const key of rollieKeys) {
+    if (rolltopiaUser.rollidex[key]) continue;
+
+    if (!dbUpdate) {
+      const rollidexLength = Object.keys(rolltopiaUser.rollidex).length;
+      if (!rolltopiaUser.achievements['Discover New Rollies']) dbUpdate = { ['achievements.Discover New Rollies']: { value: rollidexLength, nextClaim: 'common' } };
+      else dbUpdate = { [`achievements.Discover New Rollies.value`]: rollidexLength };
+    }
+
+    dbUpdate[`rollidex.${key}`] = true;
+    if (dbUpdate[`achievements.Discover New Rollies`]) dbUpdate[`achievements.Discover New Rollies`].value += 1;
+    else dbUpdate[`achievements.Discover New Rollies.value`] += 1;
+  }
+  if (!dbUpdate) return;
+
+  await rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: dbUpdate });
+}
 
 type AssetInfoRequest = Request<{},{},AssetInfoProps,AssetInfoProps>;
 export const info = async (req: AssetInfoRequest, res: CustomResponse, next: NextFunction) => {
@@ -73,6 +118,7 @@ export const getUserSlotAssets = async (req: GetUserSlotAssetsRequest, res: Cust
     const { slotId, walletUserId, idOnly, countsOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getUserSlotAssets({ slotId, walletUserId, idOnly, countsOnly }, headers);
+    if (countsOnly && slotId === rolliesSlotId) checkUserRollidex(response.body.assets as AssetCounts, headers);
 
     return res.json(response);
   }
