@@ -3,27 +3,26 @@ import { assetlayer, rolltopiaDB } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { BasicAnyObject, BasicObject, BasicResult, User } from "@assetlayer/sdk";
-import { ObjectId, WithId } from "mongodb";
-import { defaultRolltopiaAchievements } from "../levels/handlers";
+import { ObjectId } from "mongodb";
 
-async function getDBUser(id: ObjectId) {
-  return await rolltopiaDB.collection('users').findOne({ _id: id });
+async function getDBUser(_id: ObjectId) {
+  return await rolltopiaDB.collection('users').findOne({ _id });
 }
 
 async function addUserToDB(user?: User) {
   if (!user) return false;
 
   try {
-    const id = new ObjectId(user.userId);
+    const _id = new ObjectId(user.userId);
     const now = Date.now();
     const update = { 
-      _id: id, handle: user.handle, email: user.email, 
+      _id, handle: user.handle, email: user.email, 
       initialRollieClaimed: false, rollidex: {}, achievements: {},
       lastDailyClaimedAt: 0, consecutiveDailies: 0,
       lastHelixDailyClaimedAt: 0, consecutiveHelixDailies: 0,
       createdAt: now, updatedAt: now,
     };
-    const result = await rolltopiaDB.collection('users').updateOne({ _id: id }, { $setOnInsert: update }, { upsert: true });
+    const result = await rolltopiaDB.collection('users').updateOne({ _id }, { $setOnInsert: update }, { upsert: true });
 
     return !!result.upsertedCount;
   }

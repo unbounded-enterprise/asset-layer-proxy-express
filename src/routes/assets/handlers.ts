@@ -8,6 +8,8 @@ import { BasicObject } from "@assetlayer/sdk";
 import { RolltopiaUser, getRolltopiaUserInternal } from "../users/handlers";
 import { ObjectId } from "mongodb";
 
+export const rolliesSlotId = "651edf58aa4c0d48a4fe2c2c";
+
 async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string>) {
   if (!headers?.didtoken) return;
   else if (!data) return;
@@ -40,7 +42,8 @@ async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string
     }
 
     dbUpdate[`rollidex.${key}`] = true;
-    dbUpdate[`achievements.Discover New Rollies.value`] += 1;
+    if (dbUpdate[`achievements.Discover New Rollies`]) dbUpdate[`achievements.Discover New Rollies`].value += 1;
+    else dbUpdate[`achievements.Discover New Rollies.value`] += 1;
   }
   if (!dbUpdate) return;
 
@@ -115,7 +118,7 @@ export const getUserSlotAssets = async (req: GetUserSlotAssetsRequest, res: Cust
     const { slotId, walletUserId, idOnly, countsOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getUserSlotAssets({ slotId, walletUserId, idOnly, countsOnly }, headers);
-    if (countsOnly && slotId === "651edf58aa4c0d48a4fe2c2c") checkUserRollidex(response.body.assets as AssetCounts, headers);
+    if (countsOnly && slotId === rolliesSlotId) checkUserRollidex(response.body.assets as AssetCounts, headers);
 
     return res.json(response);
   }
