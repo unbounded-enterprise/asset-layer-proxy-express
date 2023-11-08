@@ -5,7 +5,7 @@ import { formatIncomingHeaders } from "../../utils/basic-format";
 import { BasicAnyObject, BasicObject, BasicResult, User } from "@assetlayer/sdk";
 import { ObjectId } from "mongodb";
 
-async function getDBUser(_id: ObjectId) {
+export async function getDBUser(_id: ObjectId) {
   return await rolltopiaDB.collection('users').findOne({ _id });
 }
 

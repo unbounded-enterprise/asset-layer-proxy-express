@@ -9,12 +9,24 @@ import { RolltopiaUser, getRolltopiaUserInternal } from "../users/handlers";
 import { ObjectId } from "mongodb";
 
 export const rolliesSlotId = "651edf58aa4c0d48a4fe2c2c";
+const rolliesCollectionIds = new Set([
+  "64be8a60616a24971532d172",
+  "64bfda7fc32ada6ec09db25b",
+  "64c03de45c47576b70e65a0a",
+  "64c6e3c7ca572704b6f55d06",
+  "64cbbe3a150b6d230c3406e0",
+  "64cbbedc510a5371d4fd1bb7",
+  "64cc1535aef54708b1822cda",
+  "65160c4dfbe760faeb3ff8c6",
+  "65160e5564a72da3ac035fd2",
+  "6529c86329f7ae7017ecfbdf",
+]);
 
-async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string>) {
+async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string>, filter?: boolean) {
   if (!headers?.didtoken) return;
   else if (!data) return;
 
-  let rollieKeys = Object.keys(data);
+  const rollieKeys = (filter) ? Object.keys(data).filter(key => rolliesCollectionIds.has(key)) : Object.keys(data);
   if (!rollieKeys.length) return;
 
   const { result: user, error } = await assetlayer.users.safe.getUser(headers);
@@ -31,7 +43,6 @@ async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string
   else if (rolltopiaUser.achievements['Discover New Rollies']?.nextClaim === 'all') return;
 
   let dbUpdate: BasicObject<any> | undefined = undefined;
-  rollieKeys = [...(new Set(rollieKeys))];
   for (const key of rollieKeys) {
     if (rolltopiaUser.rollidex[key]) continue;
 
@@ -134,6 +145,7 @@ export const getUserSlotsAssets = async (req: GetUserSlotsAssetsRequest, res: Cu
     const { slotIds, walletUserId, includeDeactivated, idOnly, countsOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getUserSlotsAssets({ slotIds, walletUserId, includeDeactivated, idOnly, countsOnly }, headers);
+    if (countsOnly && slotIds.includes(rolliesSlotId)) checkUserRollidex(response.body.assets as AssetCounts, headers, true);
 
     return res.json(response);
   }
