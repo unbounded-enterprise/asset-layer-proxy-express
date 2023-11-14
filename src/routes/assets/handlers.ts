@@ -1,7 +1,7 @@
 import { Request, NextFunction } from "express";
 import { assetlayer, rolltopiaDB } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
-import { AssetCounts, AssetInfoProps, AssetSendProps, AssetUpdateProps, AssetUserProps, GetAssetHistoryProps, GetAssetOwnershipHistoryProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
+import { Asset, AssetCounts, AssetInfoProps, AssetSendProps, AssetUpdateProps, AssetUserProps, GetAssetHistoryProps, GetAssetOwnershipHistoryProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
 import { IncomingHttpHeaders } from "http";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { BasicObject } from "@assetlayer/sdk";
@@ -73,6 +73,16 @@ async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string
   await rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: dbUpdate });
 }
 
+async function formatThenCheckUserRollidex(assets: Asset[], headers?: BasicObject<string>, filter?: boolean) {
+  if (!(assets.length > 0)) return;
+  const userRollidex: AssetCounts = {};
+  for (const asset of assets) {
+    if (filter && !rolliesCollectionIds.has(asset.collectionId)) continue;
+    if (!userRollidex[asset.collectionId]) userRollidex[asset.collectionId] = 1;
+  }
+  await checkUserRollidex(userRollidex, headers);
+}
+
 type AssetInfoRequest = Request<{},{},AssetInfoProps,AssetInfoProps>;
 export const info = async (req: AssetInfoRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -142,6 +152,7 @@ export const getUserSlotAssets = async (req: GetUserSlotAssetsRequest, res: Cust
 
     const response = await assetlayer.assets.raw.getUserSlotAssets({ slotId, walletUserId, idOnly, countsOnly }, headers);
     if (isTrue(countsOnly) && slotId === rolliesSlotId) checkUserRollidex(response.body.assets as AssetCounts, headers);
+    else if (!isTrue(idOnly) && slotId === rolliesSlotId) formatThenCheckUserRollidex(response.body.assets as Asset[], headers);
 
     return res.json(response);
   }
@@ -158,6 +169,7 @@ export const getUserSlotsAssets = async (req: GetUserSlotsAssetsRequest, res: Cu
 
     const response = await assetlayer.assets.raw.getUserSlotsAssets({ slotIds, walletUserId, includeDeactivated, idOnly, countsOnly }, headers);
     if (isTrue(countsOnly) && slotIds.includes(rolliesSlotId)) checkUserRollidex(response.body.assets as AssetCounts, headers, true);
+    else if (!isTrue(idOnly) && slotIds.includes(rolliesSlotId)) formatThenCheckUserRollidex(response.body.assets as Asset[], headers, true);
 
     return res.json(response);
   }
