@@ -10,23 +10,37 @@ import { ObjectId } from "mongodb";
 
 export const rolliesSlotId = "651edf58aa4c0d48a4fe2c2c";
 const rolliesCollectionIds = new Set([
-  "64be8a60616a24971532d172",
-  "64bfda7fc32ada6ec09db25b",
-  "64c03de45c47576b70e65a0a",
-  "64c6e3c7ca572704b6f55d06",
-  "64cbbe3a150b6d230c3406e0",
-  "64cbbedc510a5371d4fd1bb7",
-  "64cc1535aef54708b1822cda",
-  "65160c4dfbe760faeb3ff8c6",
-  "65160e5564a72da3ac035fd2",
-  "6529c86329f7ae7017ecfbdf",
+  "652f212dba3c02e6b1b0b83e",
+  "652f20abba3c02e6b1b0b5d7",
+  "652f2037ba3c02e6b1b0b370",
+  "652f1fadba3c02e6b1b0af91",
+  "652f1f2aba3c02e6b1b0ad24",
+  "652f1ea7ba3c02e6b1b0aab7",
+  "652f1e1aba3c02e6b1b0a77f",
+  "652f1da0ba3c02e6b1b0a512",
+  "652f1d23ba3c02e6b1b0a2ab",
+  "652f1c80ba3c02e6b1b09fd1",
+  "652f1bf7ba3c02e6b1b09d6a",
+  "652f1b36ba3c02e6b1b09ad6",
+  "652ef598ba3c02e6b1b08c66",
+  "651edf9aaa4c0d48a4fe2d45",
+  "651ee146aa4c0d48a4fe329e",
+  "651ee252aa4c0d48a4fe39e9",
 ]);
 
+export function isTrue(bool?: boolean | string) {
+  if (!bool) return false;
+
+  return (bool === true || bool === 'True' || bool === 'true');
+}
+
 async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string>, filter?: boolean) {
+  console.log('data', data)
   if (!headers?.didtoken) return;
   else if (!data) return;
 
   const rollieKeys = (filter) ? Object.keys(data).filter(key => rolliesCollectionIds.has(key)) : Object.keys(data);
+  console.log('rolliekeys', rollieKeys)
   if (!rollieKeys.length) return;
 
   const { result: user, error } = await assetlayer.users.safe.getUser(headers);
@@ -129,7 +143,7 @@ export const getUserSlotAssets = async (req: GetUserSlotAssetsRequest, res: Cust
     const { slotId, walletUserId, idOnly, countsOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getUserSlotAssets({ slotId, walletUserId, idOnly, countsOnly }, headers);
-    if (countsOnly && slotId === rolliesSlotId) checkUserRollidex(response.body.assets as AssetCounts, headers);
+    if (isTrue(countsOnly) && slotId === rolliesSlotId) checkUserRollidex(response.body.assets as AssetCounts, headers);
 
     return res.json(response);
   }
@@ -145,7 +159,7 @@ export const getUserSlotsAssets = async (req: GetUserSlotsAssetsRequest, res: Cu
     const { slotIds, walletUserId, includeDeactivated, idOnly, countsOnly } = { ...req.body, ...req.query };
 
     const response = await assetlayer.assets.raw.getUserSlotsAssets({ slotIds, walletUserId, includeDeactivated, idOnly, countsOnly }, headers);
-    if (countsOnly && slotIds.includes(rolliesSlotId)) checkUserRollidex(response.body.assets as AssetCounts, headers, true);
+    if (isTrue(countsOnly) && slotIds.includes(rolliesSlotId)) checkUserRollidex(response.body.assets as AssetCounts, headers, true);
 
     return res.json(response);
   }
