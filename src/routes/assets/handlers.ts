@@ -35,12 +35,10 @@ export function isTrue(bool?: boolean | string) {
 }
 
 async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string>, filter?: boolean) {
-  console.log('data', data)
   if (!headers?.didtoken) return;
   else if (!data) return;
 
   const rollieKeys = (filter) ? Object.keys(data).filter(key => rolliesCollectionIds.has(key)) : Object.keys(data);
-  console.log('rolliekeys', rollieKeys)
   if (!rollieKeys.length) return;
 
   const { result: user, error } = await assetlayer.users.safe.getUser(headers);
