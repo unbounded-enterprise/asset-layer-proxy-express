@@ -37,6 +37,7 @@ export function isTrue(bool?: boolean | string) {
 async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string>, filter?: boolean) {
   if (!headers?.didtoken) return;
   else if (!data) return;
+  else if (Array.isArray(data)) return;
 
   const rollieKeys = (filter) ? Object.keys(data).filter(key => rolliesCollectionIds.has(key)) : Object.keys(data);
   if (!rollieKeys.length) return;

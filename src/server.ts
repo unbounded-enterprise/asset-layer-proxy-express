@@ -47,6 +47,10 @@ function errorHandler(e: unknown, req: Request, res: Response, next: NextFunctio
 
 app.use(express.json());
 app.use((req, res, next) => {
+  if (process.env.NODE_ENV !== 'local' && req.header('x-forwarded-proto') !== 'https') {
+    res.redirect(`https://${req.header('host')}${req.url}`);
+  }
+
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, didtoken');
