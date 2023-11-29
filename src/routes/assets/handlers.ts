@@ -230,7 +230,7 @@ export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, ne
     const headers = formatIncomingHeaders(req.headers);
     const { collectionId, number, mintTo, walletUserId } = { ...req.body, ...req.query };
 
-    const response = await assetlayer.assets.raw.mintAssets({ collectionId, number, mintTo, walletUserId }, headers);
+    const response = await assetlayer.assets.raw.mint({ collectionId, number, mintTo, walletUserId }, headers);
 
     return res.json(response);
   }
