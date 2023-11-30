@@ -9,7 +9,7 @@ import { RolltopiaRarity, RolltopiaUser, dbUsers, getDBUser } from "../users/han
 import { rolltopiaCurrencyId } from "../levels/handlers";
 import { parseBasicError } from "../../utils/basic-error";
 
-export const rolltopiaAppId = "64dc10469f07eb4ceb26ef14";
+export const rolltopiaAppId = process.env.ASSETLAYER_APP_ID!;
 const initialRollieBreeds = [
   "652ef598ba3c02e6b1b08c66",
   "652f1b36ba3c02e6b1b09ad6"
