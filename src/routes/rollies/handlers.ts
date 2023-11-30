@@ -7,12 +7,13 @@ import { ObjectId } from "mongodb";
 import { randomRange } from "../../utils/basic-math";
 import { RolltopiaRarity, RolltopiaUser, dbUsers, getDBUser } from "../users/handlers";
 import { rolltopiaCurrencyId } from "../levels/handlers";
+import { parseBasicError } from "../../utils/basic-error";
 
 export const rolltopiaAppId = "64dc10469f07eb4ceb26ef14";
 const initialRollieBreeds = [
   "652ef598ba3c02e6b1b08c66",
   "652f1b36ba3c02e6b1b09ad6"
-];
+]; // rollieBreeds.common
 const rollieBreeds = {
   common: ["652ef598ba3c02e6b1b08c66", "652f1b36ba3c02e6b1b09ad6"],
   uncommon: ["652f1bf7ba3c02e6b1b09d6a", "652f1c80ba3c02e6b1b09fd1"],
@@ -38,13 +39,6 @@ function getRandomItem(arr:string[]) {
   const randomIndex = Math.floor(Math.random() * arr.length);
   return arr[randomIndex];
 };
-function convertToArray(obj) {
-  let array = [];
-  for (var key in obj) {
-      array[parseInt(key)]=obj[key];
-  }
-  return array;
-}
 function getMaxRarity(parentOneRarity:RolltopiaRarity, parentTwoRarity:RolltopiaRarity) {
   if (parentOneRarity === "legendary" || parentTwoRarity === "legendary") return "legendary";
   else if (parentOneRarity === "epic" || parentTwoRarity === "epic") return "epic";
@@ -92,20 +86,33 @@ function getBreed(parentOneRarity:RolltopiaRarity, parentTwoRarity:RolltopiaRari
   const chosenBreedRarity = intToRarity(chosenRarity);
   return getRandomItem(rollieBreeds[chosenBreedRarity]);
 };
-async function checkParentBreedCount(parents:Asset[]) {
-  let childrenRemaining = true;
-  parents.forEach((parent) => {
-    if (parent.properties[rolltopiaAppId].children) {
-      console.log(parent.properties[rolltopiaAppId].children.length);
-      if (        
-        parent.properties[rolltopiaAppId].children.length >= 5
-      ) {  
-        childrenRemaining = false;
+async function incrementAchievementProgress(user:RolltopiaUser, achievementName:string, inc=1) {
+  try {
+    if (user.achievements[achievementName]) {
+      const response = await dbUsers.updateOne({ _id: user._id }, {
+        $inc: { [`achievements.${achievementName}.value`]: inc }
+      });
+      
+      if (!response.modifiedCount) throw new Error(`${user._id.toString()} Not Modified (1)`);
+    }
+    else {
+      const response = await dbUsers.updateOne({ _id: user._id, "achievements.Create New Rollies": { $exists: false }}, {
+        $set: { [`achievements.${achievementName}`]: { value: 1, nextClaim: "common" } }
+      });
+
+      if (!response.modifiedCount) throw new Error(`${user._id.toString()} Not Modified (2)`);
+      else if (!response.matchedCount) {
+        const retryResponse = await dbUsers.updateOne({ _id: user._id, "achievements.Create New Rollies": { $exists: true }}, {
+          $inc: { [`achievements.${achievementName}.value`]: inc }
+        });
+        if (!response.modifiedCount) throw new Error(`${user._id.toString()} Not Modified (3)`);
       }
     }
-  });
-
-  return childrenRemaining;
+  }
+  catch(e) {
+    const error = parseBasicError(e);
+    console.error(`${achievementName} Achievement Update Failed:`, error.message);
+  }
 };
 
 type ClaimInitialRollieProps = { 
@@ -169,6 +176,8 @@ type BreedRolliesProps = {
 };
 type BreedRolliesRequest = Request<{},{},BreedRolliesProps,{}>;
 export const breedRollies = async (req: BreedRolliesRequest, res: CustomResponse, next: NextFunction) => {
+  let balanceDecreased;
+
   try {
     const { userId, parentOneId, parentTwoId } = req.body;
     const headers = formatIncomingHeaders(req.headers);
@@ -180,57 +189,71 @@ export const breedRollies = async (req: BreedRolliesRequest, res: CustomResponse
     else if (!parentTwoId) throw new BasicError('Missing parentTwoId', 400);
     else if (parentOneId === parentTwoId) throw new BasicError('Cannot breed a rollie with itself', 400);
     
+    const [assetlayerUser, user] = await Promise.all([
+      assetlayer.users.getUser(headers),
+      getDBUser(new ObjectId(userId))
+    ]) as [User | undefined, RolltopiaUser | undefined];
+    if (!assetlayerUser) throw new BasicError('User Not Found', 404);
+    else if (!user) throw new BasicError('Rolltopia User Not Found', 404);
+    else if (assetlayerUser.userId !== userId) throw new BasicError('User Not Authorized', 401);
+
     const [parentOne, parentTwo] = await assetlayer.assets.getAssets({ assetIds: [parentOneId, parentTwoId] });
     const [parentOneRarity, parentTwoRarity] = [parentOne.properties?.[rolltopiaAppId]?.rarity, parentTwo.properties?.[rolltopiaAppId]?.rarity];
     if (!parentOneRarity) throw new BasicError('Parent One Missing Rarity', 404);
     else if (!parentTwoRarity) throw new BasicError('Parent Two Missing Rarity', 404);
+    else if (parentOne.user.userId !== userId) throw new BasicError('Parent One Not Owned By User', 400);
+    else if (parentTwo.user.userId !== userId) throw new BasicError('Parent Two Not Owned By User', 400);
+    else if (parentOne.properties?.[rolltopiaAppId]?.children?.length || 0 >= 5) throw new BasicError('Parent One Breed Count Exceeded', 400);
+    else if (parentTwo.properties?.[rolltopiaAppId]?.children?.length || 0 >= 5) throw new BasicError('Parent Two Breed Count Exceeded', 400);
 
     const maxRarity = getMaxRarity(parentOneRarity, parentTwoRarity);
     const chosenBreed = getBreed(parentOneRarity, parentTwoRarity);
-    const countGood = await checkParentBreedCount([parentOne, parentTwo]);
-    if (!countGood) throw new BasicError('Breed count exceeded', 400);
-
     const balanceResult = await assetlayer.currencies.balance({ appId: rolltopiaAppId }, headers);
     const balance = balanceResult.find((currency) => currency.currencyId === rolltopiaCurrencyId)?.balance;
     if (!balance) throw new BasicError('Crystals Balance Insufficient', 404);
     else if (balance < crystalCosts[maxRarity]) throw new BasicError('Not enough crystals to breed', 400);
     
-    const spendResponse = await assetlayer.currencies.decreaseCurrencyBalance({ 
-      currencyId: "64f774cb151a6a3dee16df7c", 
+    const spendResult = await assetlayer.currencies.decreaseCurrencyBalance({ 
+      currencyId: rolltopiaCurrencyId, 
       amount: crystalCosts[maxRarity]
     }, headers);
-    const mintResponse = await assetlayer.assets.mint({
+    balanceDecreased = crystalCosts[maxRarity];
+
+    const mintResult = await assetlayer.assets.mint({
       collectionId: chosenBreed,
       number: 1,
       mintTo: userId,
       includeAssetIds: true,
     });
-    
-    const childId = mintResponse[0];
-    const updateResults = await Promise.all([
-      assetlayer.assets.updateAsset({ assetId: parentOne.assetId, properties: { children: [childId] }}),
-      assetlayer.assets.updateAsset({ assetId: parentTwo.assetId, properties: { children: [childId] }}),
-      assetlayer.assets.updateAsset({ assetId: childId, properties: { name: null, children: null, parents: [parentOne.assetId, parentTwo.assetId] }}),
-    ]);
-    const user = {} as RolltopiaUser;
-    let update;
-    let newValue = 1;
-    let nextAchievement = "common";
-    if(user.achievements["Create New Rollies"]){
-      newValue = user.achievements["Create New Rollies"].value + 1;
-      nextAchievement = user.achievements["Create New Rollies"].nextClaim;
+
+    try {
+      const childId = mintResult[0];
+      const updateResults = await Promise.all([
+        assetlayer.assets.updateAsset({ assetId: parentOne.assetId, properties: { children: [childId] }}),
+        assetlayer.assets.updateAsset({ assetId: parentTwo.assetId, properties: { children: [childId] }}),
+        assetlayer.assets.updateAsset({ assetId: childId, properties: { name: null, children: null, parents: [parentOne.assetId, parentTwo.assetId] }}),
+      ]);
+      
+      await incrementAchievementProgress(user, "Create New Rollies", 1)
     }
-    update = {
-      $set: {
-        [`achievements.Create New Rollies`]: {value: newValue, nextClaim: nextAchievement},
-      },
-    };
-    const updateResponse = await dbUsers.updateOne({ _id: new ObjectId(userId) }, update);
-    if (!updateResponse.modifiedCount) {}
+    catch(e) {
+      const error = parseBasicError(e);
+      console.error('Breed Rollies Update Failed', error.message);
+    }
 
     return res.json({ success: true, message: 'Successfully minted asset' });
   }
   catch (e) {
+    if (balanceDecreased) {
+      const headers = formatIncomingHeaders(req.headers);
+      const { result: refundResult, error } = await assetlayer.currencies.safe.increaseCurrencyBalance({ 
+        currencyId: rolltopiaCurrencyId, 
+        amount: balanceDecreased
+      }, headers);
+
+      if (error) console.error('User Crystal Refund Failed', error.message);
+    }
+
     return next(e);
   }
 }
