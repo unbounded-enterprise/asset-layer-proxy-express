@@ -7,6 +7,7 @@ import { ObjectId } from "mongodb";
 import { randomRange } from "../../utils/basic-math";
 import { RolltopiaAchievement, RolltopiaRarity, RolltopiaRarityProgress, RolltopiaUser, dbUsers, getDBUser } from "../users/handlers";
 import { rolltopiaCurrencyId } from "../levels/handlers";
+import { parseBasicError } from "../../utils/basic-error";
 
 const rolltopiaAchievements: RolltopiaAchievement[] = [
   {
@@ -180,8 +181,33 @@ const nextReward = {
   legendary: "all",
 } as const;
 
-function getAchievementDefinition(name: string) {
-  return allAchievements[name];
+export async function incrementAchievementProgress(user:RolltopiaUser, achievementName:string, inc=1) {
+  try {
+    if (user.achievements[achievementName]) {
+      const response = await dbUsers.updateOne({ _id: user._id }, {
+        $inc: { [`achievements.${achievementName}.value`]: inc }
+      });
+      
+      if (!response.modifiedCount) throw new Error(`${user._id.toString()} Not Modified (1)`);
+    }
+    else {
+      const response = await dbUsers.updateOne({ _id: user._id, "achievements.Create New Rollies": { $exists: false }}, {
+        $set: { [`achievements.${achievementName}`]: { value: 1, nextClaim: "common" } }
+      });
+
+      if (!response.modifiedCount) throw new Error(`${user._id.toString()} Not Modified (2)`);
+      else if (!response.matchedCount) {
+        const retryResponse = await dbUsers.updateOne({ _id: user._id, "achievements.Create New Rollies": { $exists: true }}, {
+          $inc: { [`achievements.${achievementName}.value`]: inc }
+        });
+        if (!response.modifiedCount) throw new Error(`${user._id.toString()} Not Modified (3)`);
+      }
+    }
+  }
+  catch(e) {
+    const error = parseBasicError(e);
+    console.error(`${achievementName} Achievement Update Failed:`, error.message);
+  }
 };
 
 async function updateUserTieredAchievement(userId: string, achievementName: string) {

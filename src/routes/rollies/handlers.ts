@@ -8,6 +8,7 @@ import { randomRange } from "../../utils/basic-math";
 import { RolltopiaRarity, RolltopiaUser, dbUsers, getDBUser } from "../users/handlers";
 import { rolltopiaCurrencyId } from "../levels/handlers";
 import { parseBasicError } from "../../utils/basic-error";
+import { incrementAchievementProgress } from "../achievements/handlers";
 
 export const rolltopiaAppId = process.env.ASSETLAYER_APP_ID!;
 const initialRollieBreeds = [
@@ -85,34 +86,6 @@ function getBreed(parentOneRarity:RolltopiaRarity, parentTwoRarity:RolltopiaRari
 
   const chosenBreedRarity = intToRarity(chosenRarity);
   return getRandomItem(rollieBreeds[chosenBreedRarity]);
-};
-async function incrementAchievementProgress(user:RolltopiaUser, achievementName:string, inc=1) {
-  try {
-    if (user.achievements[achievementName]) {
-      const response = await dbUsers.updateOne({ _id: user._id }, {
-        $inc: { [`achievements.${achievementName}.value`]: inc }
-      });
-      
-      if (!response.modifiedCount) throw new Error(`${user._id.toString()} Not Modified (1)`);
-    }
-    else {
-      const response = await dbUsers.updateOne({ _id: user._id, "achievements.Create New Rollies": { $exists: false }}, {
-        $set: { [`achievements.${achievementName}`]: { value: 1, nextClaim: "common" } }
-      });
-
-      if (!response.modifiedCount) throw new Error(`${user._id.toString()} Not Modified (2)`);
-      else if (!response.matchedCount) {
-        const retryResponse = await dbUsers.updateOne({ _id: user._id, "achievements.Create New Rollies": { $exists: true }}, {
-          $inc: { [`achievements.${achievementName}.value`]: inc }
-        });
-        if (!response.modifiedCount) throw new Error(`${user._id.toString()} Not Modified (3)`);
-      }
-    }
-  }
-  catch(e) {
-    const error = parseBasicError(e);
-    console.error(`${achievementName} Achievement Update Failed:`, error.message);
-  }
 };
 
 type ClaimInitialRollieProps = { 

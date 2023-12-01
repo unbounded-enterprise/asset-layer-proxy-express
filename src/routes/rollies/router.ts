@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { claimInitialRollie } from './handlers';
+import { breedRollies, claimInitialRollie } from './handlers';
 
 const rolliesRouter: Router = Router();
 
 rolliesRouter.post('/claim', claimInitialRollie);
+rolliesRouter.post('/breed', breedRollies);
 
 export default rolliesRouter;
