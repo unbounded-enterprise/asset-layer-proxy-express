@@ -1,11 +1,10 @@
 import { Request, NextFunction } from "express";
-import { assetlayer, rolltopiaDB } from "../../server";
+import { assetlayer, dbUsers } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { BasicAnyObject, BasicError, BasicObject, BasicResult, User } from "@assetlayer/sdk";
 import { ObjectId } from "mongodb";
 
-export const dbUsers = rolltopiaDB.collection('users');
 export async function getDBUser(_id: ObjectId) {
   return await dbUsers.findOne({ _id });
 }

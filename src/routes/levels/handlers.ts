@@ -1,7 +1,7 @@
 import { Request, NextFunction } from "express";
 import { BasicError, CustomResponse } from "../../types/basic-types";
 import { DBPlay, generateLevelProps, handleLevelEnd } from "../../utils/game-logic";
-import { assetlayer, rolltopiaDB } from "../../server";
+import { assetlayer, dbLimiterHelix, dbPlays, dbPlaysHelix, dbUsers, rolltopiaDB } from "../../server";
 import { ObjectId } from "mongodb";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { DBPlayHelix, generateLevelPropsHelix, handleLevelEndHelix } from "../../utils/game-logic-helix";
@@ -26,7 +26,7 @@ export const start = async (req: StartLevelRequest, res: CustomResponse, next: N
     const [levelProps, minRunTime, maxCoins, platformGaps, platformCoins] = await generateLevelProps(number);
     const dbPlay = { _id: new ObjectId(userId), playId: levelProps.playId, playerSpeed: levelProps.playerMovingSpeed, serverStartedAt: now, clientStartedAt: startedAt, level: number, minRunTime, maxCoins, platformGaps, platformCoins };
     
-    await rolltopiaDB.collection('plays').replaceOne({ _id: dbPlay._id }, dbPlay, { upsert: true }); 
+    await dbPlays.replaceOne({ _id: dbPlay._id }, dbPlay, { upsert: true }); 
 
     return res.json({ statusCode: 200, success: true, body: levelProps });
   }
@@ -50,8 +50,8 @@ export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextF
     const { userId, playId, coins, completed, endedAt, adWatched } = { ...req.body, ...req.query };
     const userOId = new ObjectId(userId);
     const [dbUser, dbPlay] = await Promise.all([
-      (completed) ? rolltopiaDB.collection('users').findOne({ _id: userOId }) : null,
-      rolltopiaDB.collection('plays').findOne({ _id: userOId })
+      (completed) ? dbUsers.findOne({ _id: userOId }) : null,
+      dbPlays.findOne({ _id: userOId })
     ]) as [RolltopiaUser | null, DBPlay | null];
 
     if (completed && !dbUser) throw new BasicError('User not found', 404);
@@ -64,11 +64,11 @@ export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextF
 
     await Promise.all([
       (!isNewLevel) ? null : ((!dbUser.achievements["Runway Roller Levels"]) ? (
-        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Runway Roller Levels`]: { value: dbPlay.level, nextClaim: "common" } } })
+        dbUsers.updateOne({ _id: userOId }, { $set: { [`achievements.Runway Roller Levels`]: { value: dbPlay.level, nextClaim: "common" } } })
       ) : (
-        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Runway Roller Levels.value`]: dbPlay.level } })
+        dbUsers.updateOne({ _id: userOId }, { $set: { [`achievements.Runway Roller Levels.value`]: dbPlay.level } })
       )),
-      rolltopiaDB.collection('plays').deleteOne({ _id: dbPlay._id })
+      dbPlays.deleteOne({ _id: dbPlay._id })
     ]);
 
     return res.json({ statusCode: 200, success: true, body: { balance } });
@@ -90,7 +90,7 @@ export const startHelix = async (req: StartLevelRequest, res: CustomResponse, ne
     const [levelProps, minRunTime, maxCoins, helixCoins] = await generateLevelPropsHelix(number);
     const dbPlay = { _id: new ObjectId(userId), playId: levelProps.playId, fallingSpeed: levelProps.fallingSpeed, serverStartedAt: now, clientStartedAt: startedAt, level: number, minRunTime, maxCoins, helixCoins };
     
-    await rolltopiaDB.collection('plays-helix').replaceOne({ _id: dbPlay._id }, dbPlay, { upsert: true }); 
+    await dbPlaysHelix.replaceOne({ _id: dbPlay._id }, dbPlay, { upsert: true }); 
 
     return res.json({ statusCode: 200, success: true, body: levelProps });
   }
@@ -143,9 +143,9 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     const { userId, playId, coins, completed, endedAt, adWatched } = { ...req.body, ...req.query };
     const userOId = new ObjectId(userId);
     const [dbUser, dbPlay, dbLimiter] = (await Promise.all([
-      (completed) ? rolltopiaDB.collection('users').findOne({ _id: userOId }) : null,
-      rolltopiaDB.collection('plays-helix').findOne({ _id: userOId }), 
-      rolltopiaDB.collection('limiter-helix').findOne({ _id: userOId })
+      (completed) ? dbUsers.findOne({ _id: userOId }) : null,
+      dbPlaysHelix.findOne({ _id: userOId }), 
+      dbLimiterHelix.findOne({ _id: userOId })
     ])) as [RolltopiaUser | null, DBPlayHelix | null, HelixLimiter | null];
 
     if (completed && !dbUser) throw new BasicError('User not found', 404);
@@ -166,12 +166,12 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
 
     await Promise.all([
       (!isNewLevel) ? null : ((!dbUser.achievements["Rollie Jump Levels"]) ? (
-        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Rollie Jump Levels`]: { value: dbPlay.level, nextClaim: "common" } } })
+        dbUsers.updateOne({ _id: userOId }, { $set: { [`achievements.Rollie Jump Levels`]: { value: dbPlay.level, nextClaim: "common" } } })
       ) : (
-        rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: { [`achievements.Rollie Jump Levels.value`]: dbPlay.level } })
+        dbUsers.updateOne({ _id: userOId }, { $set: { [`achievements.Rollie Jump Levels.value`]: dbPlay.level } })
       )),
-      rolltopiaDB.collection('plays-helix').deleteOne({ _id: dbPlay._id }),
-      rolltopiaDB.collection('limiter-helix').updateOne({ _id: userOId }, { $set: updatedLimiter }, { upsert: true })
+      dbPlaysHelix.deleteOne({ _id: dbPlay._id }),
+      dbLimiterHelix.updateOne({ _id: userOId }, { $set: updatedLimiter }, { upsert: true })
     ]);
 
     return res.json({ statusCode: 200, success: true, body: { balance, coinsBase, coinsLimit, rewardAmount } });

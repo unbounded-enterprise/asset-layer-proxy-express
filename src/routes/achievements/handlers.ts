@@ -1,11 +1,11 @@
 import { Request, NextFunction } from "express";
-import { assetlayer, mdb, rolltopiaDB } from "../../server";
+import { assetlayer, dbUsers, mdb, rolltopiaDB } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { BasicAnyObject, BasicError, BasicObject, BasicResult, User } from "@assetlayer/sdk";
 import { ObjectId } from "mongodb";
 import { randomRange } from "../../utils/basic-math";
-import { RolltopiaAchievement, RolltopiaRarity, RolltopiaRarityProgress, RolltopiaUser, dbUsers, getDBUser } from "../users/handlers";
+import { RolltopiaAchievement, RolltopiaRarity, RolltopiaRarityProgress, RolltopiaUser, getDBUser } from "../users/handlers";
 import { rolltopiaCurrencyId } from "../levels/handlers";
 import { parseBasicError } from "../../utils/basic-error";
 
@@ -233,24 +233,12 @@ async function updateUserTieredAchievement(userId: string, achievementName: stri
 
     const { nextClaim, value } = (dbUser as RolltopiaUser).achievements[achievementName];
 
-    if (nextClaim === 'all') {
-      await session.abortTransaction();
-
-      throw new BasicError('All Achievement Tiers Already Complete', 400);
-    }
-    else if (value < neededTierValues[nextClaim]) {
-      await session.abortTransaction();
-
-      throw new BasicError('Achievement Tier Not Complete', 400);
-    }
+    if (nextClaim === 'all') throw new BasicError('All Achievement Tiers Already Complete', 400);
+    else if (value < neededTierValues[nextClaim]) throw new BasicError('Achievement Tier Not Complete', 400);
     
     const result = await dbUsers.updateOne({ _id: userOID }, { $set: { [`achievements.${achievementName}.nextClaim`]: nextReward[nextClaim] } });
 
-    if (!result.modifiedCount) {
-      await session.abortTransaction();
-
-      throw new BasicError('Achievement Update Failed', 400);
-    }
+    if (!result.modifiedCount) throw new BasicError('Achievement Update Failed', 400);
 
     currentNextClaim = nextClaim;
     await session.commitTransaction();

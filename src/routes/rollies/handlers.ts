@@ -1,11 +1,11 @@
 import { Request, NextFunction } from "express";
-import { assetlayer, rolltopiaDB } from "../../server";
+import { assetlayer, dbUsers, rolltopiaDB } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { Asset, BasicAnyObject, BasicError, BasicObject, BasicResult, User } from "@assetlayer/sdk";
 import { ObjectId } from "mongodb";
 import { randomRange } from "../../utils/basic-math";
-import { RolltopiaRarity, RolltopiaUser, dbUsers, getDBUser } from "../users/handlers";
+import { RolltopiaRarity, RolltopiaUser, getDBUser } from "../users/handlers";
 import { rolltopiaCurrencyId } from "../levels/handlers";
 import { parseBasicError } from "../../utils/basic-error";
 import { incrementAchievementProgress } from "../achievements/handlers";
@@ -176,8 +176,8 @@ export const breedRollies = async (req: BreedRolliesRequest, res: CustomResponse
     else if (!parentTwoRarity) throw new BasicError('Parent Two Missing Rarity', 404);
     else if (parentOne.user.userId !== userId) throw new BasicError('Parent One Not Owned By User', 400);
     else if (parentTwo.user.userId !== userId) throw new BasicError('Parent Two Not Owned By User', 400);
-    else if (parentOne.properties?.[rolltopiaAppId]?.children?.length || 0 >= 5) throw new BasicError('Parent One Breed Count Exceeded', 400);
-    else if (parentTwo.properties?.[rolltopiaAppId]?.children?.length || 0 >= 5) throw new BasicError('Parent Two Breed Count Exceeded', 400);
+    else if ((parentOne.properties?.[rolltopiaAppId]?.children?.length || 0) >= 5) throw new BasicError('Parent One Breed Count Exceeded', 400);
+    else if ((parentTwo.properties?.[rolltopiaAppId]?.children?.length || 0) >= 5) throw new BasicError('Parent Two Breed Count Exceeded', 400);
 
     const maxRarity = getMaxRarity(parentOneRarity, parentTwoRarity);
     const chosenBreed = getBreed(parentOneRarity, parentTwoRarity);

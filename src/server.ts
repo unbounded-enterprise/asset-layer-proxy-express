@@ -30,6 +30,10 @@ let server: Server;
 
 export const mdb = new MongoClient(mep);
 export const rolltopiaDB = mdb.db('rolltopia');
+export const dbUsers = rolltopiaDB.collection('users');
+export const dbPlays = rolltopiaDB.collection('plays');
+export const dbPlaysHelix = rolltopiaDB.collection('plays-helix');
+export const dbLimiterHelix = rolltopiaDB.collection('limiter-helix');
 export const assetlayer = new AssetLayer({
   appSecret: process.env.ASSETLAYER_APP_SECRET!,
 });

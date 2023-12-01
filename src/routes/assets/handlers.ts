@@ -1,5 +1,5 @@
 import { Request, NextFunction } from "express";
-import { assetlayer, rolltopiaDB } from "../../server";
+import { assetlayer, dbUsers, rolltopiaDB } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { Asset, AssetCounts, AssetInfoProps, AssetSendProps, AssetUpdateProps, AssetUserProps, GetAssetHistoryProps, GetAssetOwnershipHistoryProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
 import { IncomingHttpHeaders } from "http";
@@ -71,7 +71,7 @@ async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string
   }
   if (!dbUpdate) return;
 
-  await rolltopiaDB.collection('users').updateOne({ _id: userOId }, { $set: dbUpdate });
+  await dbUsers.updateOne({ _id: userOId }, { $set: dbUpdate });
 }
 
 async function formatThenCheckUserRollidex(assets: Asset[], headers?: BasicObject<string>, filter?: boolean) {
