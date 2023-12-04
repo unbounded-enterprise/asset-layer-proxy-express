@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { Server } from 'http';
 import { MongoClient } from 'mongodb';
 import { AssetLayer } from '@assetlayer/sdk';
+import achievementsRouter from './routes/achievements/router';
 import appsRouter from './routes/apps/router';
 import assetsRouter from './routes/assets/router';
 import collectionsRouter from './routes/collections/router';
@@ -14,6 +15,7 @@ import listingsRouter from './routes/listings/router';
 import levelsRouter from './routes/levels/router';
 // import magicRouter from './routes/magic/router';
 import rollidexRouter from './routes/rollidex/router';
+import rolliesRouter from './routes/rollies/router';
 import shopRouter from './routes/shop/router';
 import slotsRouter from './routes/slots/router';
 import usersRouter from './routes/users/router';
@@ -26,8 +28,12 @@ const apiRoute = '/api';
 const mep = process.env.MONGO_ENDPOINT || "";
 let server: Server;
 
-const mdb = new MongoClient(mep);
+export const mdb = new MongoClient(mep);
 export const rolltopiaDB = mdb.db('rolltopia');
+export const dbUsers = rolltopiaDB.collection('users');
+export const dbPlays = rolltopiaDB.collection('plays');
+export const dbPlaysHelix = rolltopiaDB.collection('plays-helix');
+export const dbLimiterHelix = rolltopiaDB.collection('limiter-helix');
 export const assetlayer = new AssetLayer({
   appSecret: process.env.ASSETLAYER_APP_SECRET!,
 });
@@ -41,6 +47,8 @@ function errorHandler(e: unknown, req: Request, res: Response, next: NextFunctio
   const error = parseBasicError(e);
   const statusCode = error.status || 500;
   const message = error.message || 'Request Failed';
+
+  console.error('Error Handler:', error);
   
   return res.status(error.status).json({ statusCode, success: false, message });
 }
@@ -59,6 +67,7 @@ app.use((req, res, next) => {
 
   next();
 });
+app.use(`${apiRoute}/achievement`,achievementsRouter);
 app.use(`${apiRoute}/app`, appsRouter);
 app.use(`${apiRoute}/asset`, assetsRouter);
 app.use(`${apiRoute}/collection`, collectionsRouter);
@@ -72,6 +81,7 @@ app.use(`${apiRoute}/level`, levelsRouter);
 // app.use(`${apiRoute}/magic`, magicRouter);
 // app.use(`${apiRoute}/permission`, permissionRouter);
 app.use(`${apiRoute}/rollidex`, rollidexRouter);
+app.use(`${apiRoute}/rollies`, rolliesRouter);
 app.use(`${apiRoute}/shop`, shopRouter);
 app.use(`${apiRoute}/slot`, slotsRouter);
 // app.use(`${apiRoute}/stripe`, stripeRouter);
