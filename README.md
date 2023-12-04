@@ -2,6 +2,7 @@
 
 ```sh
 $ npm install
+$ npm install -g ts-node
 ```
 
 ```sh
