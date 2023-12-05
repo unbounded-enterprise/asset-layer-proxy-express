@@ -21,6 +21,7 @@ import shopRouter from './routes/shop/router';
 import slotsRouter from './routes/slots/router';
 import stripeRouter from './routes/stripe/router';
 import usersRouter from './routes/users/router';
+import webhooksRouter from './routes/webhooks/router';
 import { parseBasicError } from './utils/basic-error';
 
 const validErrorStatusCodes = new Set([400,401,404,406,407,409]);
@@ -56,7 +57,6 @@ function errorHandler(e: unknown, req: Request, res: Response, next: NextFunctio
   return res.status(error.status).json({ statusCode, success: false, message });
 }
 
-app.use(express.json());
 app.use((req, res, next) => {
   if (process.env.NODE_ENV !== 'local' && req.header('x-forwarded-proto') !== 'https') {
     res.redirect(`https://${req.header('host')}${req.url}`);
@@ -70,6 +70,8 @@ app.use((req, res, next) => {
 
   next();
 });
+app.use(`${apiRoute}/webhook`, webhooksRouter);
+app.use(express.json());
 app.use(`${apiRoute}/achievement`, achievementsRouter);
 app.use(`${apiRoute}/app`, appsRouter);
 app.use(`${apiRoute}/asset`, assetsRouter);
