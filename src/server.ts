@@ -11,6 +11,7 @@ import currenciesRouter from './routes/currencies/router';
 import dailiesRouter from './routes/dailies/router';
 import equipsRouter from './routes/equips/router';
 // import expressionsRouter from './routes/expressions/router';
+import handcashRouter from './routes/handcash/router';
 import listingsRouter from './routes/listings/router';
 import levelsRouter from './routes/levels/router';
 // import magicRouter from './routes/magic/router';
@@ -18,6 +19,7 @@ import rollidexRouter from './routes/rollidex/router';
 import rolliesRouter from './routes/rollies/router';
 import shopRouter from './routes/shop/router';
 import slotsRouter from './routes/slots/router';
+import stripeRouter from './routes/stripe/router';
 import usersRouter from './routes/users/router';
 import { parseBasicError } from './utils/basic-error';
 
@@ -34,6 +36,7 @@ export const dbUsers = rolltopiaDB.collection('users');
 export const dbPlays = rolltopiaDB.collection('plays');
 export const dbPlaysHelix = rolltopiaDB.collection('plays-helix');
 export const dbLimiterHelix = rolltopiaDB.collection('limiter-helix');
+export const dbInvoices = rolltopiaDB.collection('invoices');
 export const assetlayer = new AssetLayer({
   appSecret: process.env.ASSETLAYER_APP_SECRET!,
 });
@@ -67,7 +70,7 @@ app.use((req, res, next) => {
 
   next();
 });
-app.use(`${apiRoute}/achievement`,achievementsRouter);
+app.use(`${apiRoute}/achievement`, achievementsRouter);
 app.use(`${apiRoute}/app`, appsRouter);
 app.use(`${apiRoute}/asset`, assetsRouter);
 app.use(`${apiRoute}/collection`, collectionsRouter);
@@ -75,7 +78,7 @@ app.use(`${apiRoute}/currency`, currenciesRouter);
 app.use(`${apiRoute}/daily`, dailiesRouter);
 app.use(`${apiRoute}/equip`, equipsRouter);
 // app.use(`${apiRoute}/expression`, expressionsRouter);
-// app.use(`${apiRoute}/handcash`, handcashRouter);
+app.use(`${apiRoute}/handcash`, handcashRouter);
 app.use(`${apiRoute}/listing`, listingsRouter);
 app.use(`${apiRoute}/level`, levelsRouter);
 // app.use(`${apiRoute}/magic`, magicRouter);
@@ -84,7 +87,7 @@ app.use(`${apiRoute}/rollidex`, rollidexRouter);
 app.use(`${apiRoute}/rollies`, rolliesRouter);
 app.use(`${apiRoute}/shop`, shopRouter);
 app.use(`${apiRoute}/slot`, slotsRouter);
-// app.use(`${apiRoute}/stripe`, stripeRouter);
+app.use(`${apiRoute}/stripe`, stripeRouter);
 // app.use(`${apiRoute}/team`, teamRouter);
 app.use(`${apiRoute}/user`, usersRouter);
 app.use('/test', async (req: any, res: any, next: NextFunction) => {

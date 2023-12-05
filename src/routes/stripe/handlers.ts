@@ -3,7 +3,7 @@ import { BasicError, CustomResponse } from "../../types/basic-types";
 import Stripe from "stripe";
 import { rolltopiaCurrencyId } from "../levels/handlers";
 import { assetlayer } from "../../server";
-import { createBundleMetadata, dbInvoices, rolltopiaBundles } from "../handcash/handlers";
+import { createBundleMetadata, rolltopiaBundles } from "../handcash/handlers";
 
 const webhookSecret = process.env.PAYMENT_INTENT_WEBHOOK_SECRET!;
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2023-10-16' });
