@@ -210,7 +210,7 @@ export async function incrementAchievementProgress(user:RolltopiaUser, achieveme
   }
 };
 
-async function updateUserTieredAchievement(userId: string, achievementName: string) {
+async function updateUserTieredAchievement(userOID: ObjectId, achievementName: string) {
   const achievementTiers = allAchievements[achievementName].tiers;
   if (!achievementTiers) throw new BasicError('Achievement Tier Not Found', 404);
 
@@ -225,7 +225,6 @@ async function updateUserTieredAchievement(userId: string, achievementName: stri
   session.startTransaction();
 
   try {
-    const userOID = new ObjectId(userId);
     const dbUser = await getDBUser(userOID);
 
     if (!dbUser) throw new BasicError('User Not Found', 404);
@@ -253,31 +252,30 @@ async function updateUserTieredAchievement(userId: string, achievementName: stri
   return currentNextClaim as RolltopiaRarity;
 }
 
-type ClaimAchievementProps = { 
-  userId: string;
+type ClaimAchievementProps = {
   achievementName: string;
 };
 type ClaimAchievementRequest = Request<{},{},ClaimAchievementProps,{}>;
 export const claimAchievement = async (req: ClaimAchievementRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { userId, achievementName } = req.body;
+    const { achievementName } = req.body;
     const headers = formatIncomingHeaders(req.headers);
 
-    if (!userId) throw new BasicError('Missing userId', 400);
-    else if (typeof userId !== 'string') throw new BasicError('Invalid userId', 400);
-    else if (!headers?.didtoken) throw new BasicError('Missing didtoken', 400);
+    if (!headers?.didtoken) throw new BasicError('Missing didtoken', 400);
     else if (!achievementName) throw new BasicError('Missing achievementName', 400);
     
-    const nextClaim = await updateUserTieredAchievement(userId, achievementName);
+    const user = await assetlayer.users.getUser(headers);
+    const userOID = new ObjectId(user.userId);
+    const nextClaim = await updateUserTieredAchievement(userOID, achievementName);
     const { result: rewardResult, error } = await assetlayer.currencies.safe.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmounts[nextClaim] }, headers);
 
     if (error) {
-      const undoResult = await dbUsers.updateOne({ _id: new ObjectId(userId) }, { $set: { [`achievements.${achievementName}.nextClaim`]: nextClaim } });
+      const undoResult = await dbUsers.updateOne({ _id: userOID }, { $set: { [`achievements.${achievementName}.nextClaim`]: nextClaim } });
       
       throw error;
     }
 
-    return res.json({ success: true, message: 'Reward claimed and user updated successfully' });
+    return res.json({ statusCode: 200, success: true, message: 'Reward claimed and user updated successfully' });
   }
   catch (e) {
     return next(e);
