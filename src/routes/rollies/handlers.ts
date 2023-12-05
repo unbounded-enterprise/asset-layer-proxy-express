@@ -135,7 +135,7 @@ export const claimInitialRollie = async (req: ClaimInitialRollieRequest, res: Cu
       throw error;
     };
 
-    return res.json({ success: true, message: 'Successfully minted asset' });
+    return res.json({ statusCode: 200, success: true, message: 'Successfully minted asset' });
   }
   catch (e) {
     return next(e);
@@ -198,9 +198,9 @@ export const breedRollies = async (req: BreedRolliesRequest, res: CustomResponse
       mintTo: userId,
       includeAssetIds: true,
     });
+    const childId = mintResult[0];
 
     try {
-      const childId = mintResult[0];
       const updateResults = await Promise.all([
         assetlayer.assets.updateAsset({ assetId: parentOne.assetId, properties: { children: [childId] }}),
         assetlayer.assets.updateAsset({ assetId: parentTwo.assetId, properties: { children: [childId] }}),
@@ -214,7 +214,7 @@ export const breedRollies = async (req: BreedRolliesRequest, res: CustomResponse
       console.error('Breed Rollies Update Failed', error.message);
     }
 
-    return res.json({ success: true, message: 'Successfully minted asset' });
+    return res.json({ statusCode: 200, success: true, body: { childId } });
   }
   catch (e) {
     if (balanceDecreased) {

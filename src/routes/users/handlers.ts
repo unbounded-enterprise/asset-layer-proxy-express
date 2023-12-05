@@ -9,19 +9,20 @@ export async function getDBUser(_id: ObjectId) {
   return await dbUsers.findOne({ _id });
 }
 
-async function addUserToDB(user: User) {
-  const _id = new ObjectId(user.userId);
-  const now = Date.now();
-  const update = { 
+function newUserProps(user: User, _id=(new ObjectId(user.userId)), now=Date.now()) {
+  return {
     _id, handle: user.handle, email: user.email, 
     initialRollieClaimed: false, rollidex: {}, achievements: {},
     lastDailyClaimedAt: 0, consecutiveDailies: 0,
     lastHelixDailyClaimedAt: 0, consecutiveHelixDailies: 0,
     createdAt: now, updatedAt: now,
-  };
-
-  return await dbUsers.updateOne({ _id }, { $setOnInsert: update }, { upsert: true });
+  } as RolltopiaUser;
 }
+
+async function addUserToDB(user: User, _id=(new ObjectId(user.userId)), newUser=(newUserProps(user))) {
+  return await dbUsers.updateOne({ _id }, { $setOnInsert: newUser }, { upsert: true });
+}
+
 async function addUserToDBSafe(user?: User) {
   if (!user) return false;
 
@@ -103,6 +104,7 @@ export const getRolltopiaUser = async (req: GetRolltopiaUserRequest, res: Custom
   try {
     const { userId } = { ...req.body, ...req.query };
     if (!userId) throw new Error('Missing userId');
+    else if (typeof userId !== 'string') throw new BasicError('Invalid userId', 400);
 
     const user = await getDBUser(new ObjectId(userId));
     if (!user) throw new Error('User not found');
@@ -114,19 +116,20 @@ export const getRolltopiaUser = async (req: GetRolltopiaUserRequest, res: Custom
   }
 }
 
-type NewRolltopiaUserProps = { user: User; };
-type NewRolltopiaUserRequest = Request<{},{},NewRolltopiaUserProps,{}>;
+type NewRolltopiaUserRequest = Request<{},{},{},{}>;
 export const newUser = async (req: NewRolltopiaUserRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { user } = req.body;
+    const headers = formatIncomingHeaders(req.headers);
 
-    if (!user) throw new BasicError('Missing user', 400);
+    if (!headers?.didtoken) throw new BasicError('Missing didtoken', 400);
 
+    const user = await assetlayer.users.getUser(headers);
+    const newUser = newUserProps(user);
     const result = await addUserToDB(user);
 
     if (!result.upsertedCount) throw new BasicError('Failed to upsert user', 500);
 
-    return res.json({ success: true });
+    return res.json({ statusCode: 200, success: true, body: { newUser } });
   }
   catch (e) {
     return next(e);
