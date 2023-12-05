@@ -79,12 +79,12 @@ function getPaymentProps(userId: string, bundle: RolltopiaBundle) {
       notifications: {
         webhook: {
           customParameters: createBundleMetadata(userId, bundle),
-          webhookUrl: 'https://www.rolltopia.games/api/handcash/paymentWebhook'
+          webhookUrl: 'https://api.rolltopia.games/api/handcash/paymentWebhook'
         },
         email: 'jordan@assetlayer.com'
       },
       expirationType: 'never',
-      redirectUrl: process.env.URL + '/shop?purchaseCompleteBundleId=' + bundle.bundleId,
+      redirectUrl: 'https://www.rolltopia.games/shop?purchaseCompleteBundleId=' + bundle.bundleId,
     }
   };
 }
