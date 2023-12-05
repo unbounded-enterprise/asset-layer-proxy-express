@@ -82,14 +82,16 @@ export const paymentIntentWebhook = async (req: PaymentIntentWebhookRequest, res
           console.error('Failed to update invoice', paymentIntent.id)
         }
         */
+
+        return res.json({ statusCode: 200, success: true });
       }
       case 'payment_intent.payment_failed': {
-        const message = paymentIntent.last_payment_error && paymentIntent.last_payment_error.message;
-        console.log('Stripe Payment Failed:', paymentIntent.id, message);
+        const message = `Stripe Payment Failed [paymentIntent.id]: ${paymentIntent.last_payment_error?.message || ''}`;
+        throw new BasicError(message, 409);
       }
     }
 
-    return res.json({ statusCode: 200, success: true });
+    throw new BasicError('payment intent invalid event type', 409);
   }
   catch (e) {
     return next(e);
