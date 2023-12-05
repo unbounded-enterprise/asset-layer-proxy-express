@@ -3,7 +3,7 @@ import { BasicError, CustomResponse } from "../../types/basic-types";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { BasicObject } from "@assetlayer/sdk";
 import { rolltopiaCurrencyId } from "../levels/handlers";
-import { assetlayer, mdb } from "../../server";
+import { assetlayer, dbInvoices } from "../../server";
 import axios from "axios";
 
 export interface RolltopiaBundle {
@@ -14,7 +14,6 @@ export interface RolltopiaBundle {
   quantity: number;
 }
 
-export const dbInvoices = mdb.db('rolltopia').collection('invoices');
 export const rolltopiaBundles: BasicObject<RolltopiaBundle> = {
   '0': {
 	  appId: process.env.ASSETLAYER_APP_ID!,
