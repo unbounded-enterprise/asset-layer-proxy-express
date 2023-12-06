@@ -4,7 +4,7 @@ import { CustomResponse } from "../../types/basic-types";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { Asset, BasicAnyObject, BasicError, BasicObject, BasicResult, User } from "@assetlayer/sdk";
 import { ObjectId } from "mongodb";
-import { randomRange } from "../../utils/basic-math";
+import { inRange, randomRange } from "../../utils/basic-math";
 import { RolltopiaRarity, RolltopiaUser, getDBUser } from "../users/handlers";
 import { rolltopiaCurrencyId } from "../levels/handlers";
 import { parseBasicError } from "../../utils/basic-error";
@@ -90,17 +90,19 @@ function getBreed(parentOneRarity:RolltopiaRarity, parentTwoRarity:RolltopiaRari
 
 type ClaimInitialRollieProps = { 
   userId: string;
+  rollieBreed: number;
 };
 type ClaimInitialRollieRequest = Request<{},{},ClaimInitialRollieProps,{}>;
 export const claimInitialRollie = async (req: ClaimInitialRollieRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { userId } = req.body;
+    const { userId, rollieBreed } = req.body;
 
     if (!userId) throw new BasicError('Missing userId', 400);
     else if (typeof userId !== 'string') throw new BasicError('Invalid userId', 400);
+    else if (!rollieBreed) throw new BasicError('Missing rollieBreed', 400);
+    else if (typeof rollieBreed !== 'number' || !inRange(rollieBreed, 1, 2)) throw new BasicError('Invalid rollieBreed', 400);
 
-    const breed = initialRollieBreeds[randomRange(0, 1)];
-
+    const breed = initialRollieBreeds[rollieBreed - 1];
     const claimResult = await dbUsers.updateOne(
       { _id: new ObjectId(userId), initialRollieClaimed: false },
       { $set: { initialRollieClaimed: true } }
