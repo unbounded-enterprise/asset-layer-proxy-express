@@ -30,7 +30,7 @@ const breedRarities = [
   [[.5,4.5,90,4.5,.5],[0,5,45,45,5],[0,.5,9.5,80,10],[0,.5,9.5,80,10],[0,0,5,70,25]],
 ];
 const crystalCosts = {
-  common: 1,
+  common: 1000,
   uncommon: 2500,
   rare: 5000,
   epic: 10000,
