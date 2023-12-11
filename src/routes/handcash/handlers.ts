@@ -70,7 +70,7 @@ function getPaymentProps(userId: string, bundle: RolltopiaBundle) {
       product: {
         name: 'Rolltopia',
         description: 'Let the good times roll.',
-        imageUrl: 'https://www.rolltopia.games/static/explorerImage.png'
+        imageUrl: 'https://www.rolltopia.games/static/rolltopia_handcash_app_image.png'
       },
       receivers: [
         { sendAmount: bundle.price, currencyCode: 'USD', destination: 'dubby' }
