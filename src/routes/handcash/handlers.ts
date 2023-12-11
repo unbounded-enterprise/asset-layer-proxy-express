@@ -73,7 +73,7 @@ function getPaymentProps(userId: string, bundle: RolltopiaBundle) {
         imageUrl: 'https://www.rolltopia.games/static/rolltopia_handcash_app_image.png'
       },
       receivers: [
-        { sendAmount: bundle.price, currencyCode: 'USD', destination: 'dubby' }
+        { sendAmount: bundle.price, currencyCode: 'USD', destination: 'rolltopia' }
       ],
       requestedUserData: ['paymail'],
       notifications: {
