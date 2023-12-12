@@ -41,13 +41,12 @@ export type EndLevelProps = {
   coins: number; // coins collected by player
   completed: boolean; // whether player completed level
   endedAt: number; // ended timestamp (milliseconds) set before request
-  adWatched: boolean; // TEMPORARY: whether player watched ad for bonus (completed only)
 };
 type EndLevelRequest = Request<{},{},EndLevelProps,EndLevelProps>;
 export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { userId, playId, coins, completed, endedAt, adWatched } = { ...req.body, ...req.query };
+    const { userId, playId, coins, completed, endedAt } = { ...req.body, ...req.query };
     const userOId = new ObjectId(userId);
     const [dbUser, dbPlay] = await Promise.all([
       (completed) ? dbUsers.findOne({ _id: userOId }) : null,
@@ -58,7 +57,7 @@ export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextF
     else if (!dbPlay) throw new BasicError('Play not found', 404);
     else if (dbPlay.playId.toString() !== playId) throw new BasicError('Play ID mismatch', 400);
 
-    const rewardAmount = await handleLevelEnd({ coins, completed, endedAt, adWatched }, dbPlay);
+    const rewardAmount = await handleLevelEnd({ coins, completed, endedAt }, dbPlay);
     const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
     const isNewLevel = ((completed && dbPlay.level <= 100 && dbUser) && (!dbUser.achievements["Runway Roller Levels"] || dbUser.achievements["Runway Roller Levels"].value < dbPlay.level));
 
@@ -107,10 +106,8 @@ export type HelixLimiter = {
   }[];
 }
 
-function calculateRewardMultiplier(level: number, completed: boolean, adWatched: boolean) {
+function calculateRewardMultiplier(level: number, completed: boolean) {
   let multiplier = 1 + (level / 100);
-
-  if (adWatched && completed) multiplier *= 2;
 
   return multiplier;
 }
@@ -140,7 +137,7 @@ function getCoinLimit(start: number, earned: number, limiter: HelixLimiter | nul
 export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { userId, playId, coins, completed, endedAt, adWatched } = { ...req.body, ...req.query };
+    const { userId, playId, coins, completed, endedAt } = { ...req.body, ...req.query };
     const userOId = new ObjectId(userId);
     const [dbUser, dbPlay, dbLimiter] = (await Promise.all([
       (completed) ? dbUsers.findOne({ _id: userOId }) : null,
@@ -153,7 +150,7 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     else if (dbPlay.playId.toString() !== playId) throw new BasicError('Play ID mismatch', 400);
 
     const coinsEarned = await handleLevelEndHelix({ coins, completed, endedAt }, dbPlay);
-    const multiplier = calculateRewardMultiplier(dbPlay.level, completed, adWatched);
+    const multiplier = calculateRewardMultiplier(dbPlay.level, completed);
     const coinsLimit = getCoinLimit(dbPlay.serverStartedAt, coinsEarned, dbLimiter);
     const coinsBase = coinsLimit || coinsEarned;
     const rewardAmount = Math.round(((completed) ? coinsBase + 50 : coinsBase) * multiplier);
