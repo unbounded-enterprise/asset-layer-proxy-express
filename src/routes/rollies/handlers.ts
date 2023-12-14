@@ -97,7 +97,7 @@ export const claimInitialRollie = async (req: ClaimInitialRollieRequest, res: Cu
     if (!userId) throw new BasicError('Missing userId', 400);
     else if (typeof userId !== 'string') throw new BasicError('Invalid userId', 400);
     else if (!rollieBreed) throw new BasicError('Missing rollieBreed', 400);
-    else if (typeof rollieBreed !== 'number' || !inRange(rollieBreed, 1, 2)) throw new BasicError('Invalid rollieBreed', 400);
+    else if (typeof rollieBreed !== 'number' || !inRange(rollieBreed, 1, 6)) throw new BasicError('Invalid rollieBreed', 400);
 
     const breed = initialRollieBreeds[rollieBreed - 1];
     const claimResult = await dbUsers.updateOne(
