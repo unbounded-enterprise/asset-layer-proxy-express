@@ -431,9 +431,8 @@ export type HandleLevelEndProps = {
   coins: number;
   completed: boolean;
   endedAt: number;
-  adWatched: boolean;
 };
-export async function handleLevelEnd({ coins, completed, endedAt, adWatched }: HandleLevelEndProps, dbPlay: DBPlay) {
+export async function handleLevelEnd({ coins, completed, endedAt }: HandleLevelEndProps, dbPlay: DBPlay) {
   if (coins > dbPlay.maxCoins) throw new Error('Max coins exceeded');
 
   const now = Date.now();
@@ -465,7 +464,6 @@ export async function handleLevelEnd({ coins, completed, endedAt, adWatched }: H
     }
   }
 
-  if (adWatched && completed) coins *= 2;
   if (completed) {
     coins += 50;
   }
