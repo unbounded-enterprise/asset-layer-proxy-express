@@ -36,7 +36,7 @@ export const createPaymentIntent = async (req: CreatePaymentIntentRequest, res: 
       currency: 'usd',
       automatic_payment_methods: { enabled: true }, // default true
       // payment_method_types: ['card'], // defaults to payment methods in set in stripe dashboard
-      statement_descriptor: `OTK ${bundle.quantity}`, // max length + prefix (stripe dashboard) = 22
+      statement_descriptor: `RTK ${bundle.quantity}`, // max length + prefix (stripe dashboard) = 22
       metadata: createBundleMetadata(userId, bundle),
     };
 
@@ -86,7 +86,7 @@ export const paymentIntentWebhook = async (req: PaymentIntentWebhookRequest, res
         return res.json({ statusCode: 200, success: true });
       }
       case 'payment_intent.payment_failed': {
-        const message = `Stripe Payment Failed [paymentIntent.id]: ${paymentIntent.last_payment_error?.message || ''}`;
+        const message = `Stripe Payment Failed [${paymentIntent.id}]: ${paymentIntent.last_payment_error?.message || ''}`;
         throw new BasicError(message, 409);
       }
     }
