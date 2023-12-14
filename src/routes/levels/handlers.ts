@@ -7,7 +7,7 @@ import { formatIncomingHeaders } from "../../utils/basic-format";
 import { DBPlayHelix, generateLevelPropsHelix, handleLevelEndHelix } from "../../utils/game-logic-helix";
 import { RolltopiaUser } from "../users/handlers";
 
-export const rolltopiaCurrencyId = "64f774cb151a6a3dee16df7c";
+export const rolltopiaCurrencyId = "6579e87778a838b7d59433fc";
     
 export type StartLevelProps = { 
   userId: string; // ObjectId used to save play
