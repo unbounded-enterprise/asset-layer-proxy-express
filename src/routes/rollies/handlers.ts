@@ -11,16 +11,13 @@ import { parseBasicError } from "../../utils/basic-error";
 import { incrementAchievementProgress } from "../achievements/handlers";
 
 export const rolltopiaAppId = process.env.ASSETLAYER_APP_ID!;
-const initialRollieBreeds = [
-  "652ef598ba3c02e6b1b08c66",
-  "652f1b36ba3c02e6b1b09ad6"
-]; // rollieBreeds.common
+const initialRollieBreeds = ["657a508678a838b7d59515e5", "657a510478a838b7d59517aa", "657a518478a838b7d59519b9", "657a520878a838b7d5951b2e", "657a528478a838b7d5951d55", "657a530578a838b7d595235a"] // rollieBreeds.common
 const rollieBreeds = {
-  common: ["652ef598ba3c02e6b1b08c66", "652f1b36ba3c02e6b1b09ad6"],
-  uncommon: ["652f1bf7ba3c02e6b1b09d6a", "652f1c80ba3c02e6b1b09fd1"],
-  rare: ["652f1d23ba3c02e6b1b0a2ab", "652f1da0ba3c02e6b1b0a512", "652f1e1aba3c02e6b1b0a77f"],
-  epic: ["652f1ea7ba3c02e6b1b0aab7", "652f1f2aba3c02e6b1b0ad24", "652f1fadba3c02e6b1b0af91"],
-  legendary: ["652f2037ba3c02e6b1b0b370", "652f20abba3c02e6b1b0b5d7", "652f212dba3c02e6b1b0b83e"],
+  common: ["657a508678a838b7d59515e5", "657a510478a838b7d59517aa", "657a518478a838b7d59519b9", "657a520878a838b7d5951b2e", "657a528478a838b7d5951d55", "657a530578a838b7d595235a"],
+  uncommon: ["657a4d6e78a838b7d59503a6", "657a4e2778a838b7d59506f1", "657a4ea178a838b7d5950d5c", "657a4f1178a838b7d59510bd", "657a4f8278a838b7d595129f"],
+  rare: ["657a487178a838b7d594eb50", "657a495f78a838b7d594f359", "657a49cd78a838b7d594f596", "657a4a7478a838b7d594f73f", "657a4b0178a838b7d594f8b4"],
+  epic: ["657a356278a838b7d594d0fd", "657a362f78a838b7d594d27b", "657a36cf78a838b7d594d40d", "657a377c78a838b7d594d582", "657a382178a838b7d594d815"],
+  legendary: ["657a222e78a838b7d594acb3", "657a311378a838b7d594ca8a", "657a31d278a838b7d594cc99", "657a32da78a838b7d594ce14"],
 };
 const breedRarities = [
   [[90,9,1,0,0],[45,45,9,1,0],[4.5,90,4.5,1,0],[5,45,45,5,0],[.5,4.5,90,4.5,.5]],
@@ -100,7 +97,7 @@ export const claimInitialRollie = async (req: ClaimInitialRollieRequest, res: Cu
     if (!userId) throw new BasicError('Missing userId', 400);
     else if (typeof userId !== 'string') throw new BasicError('Invalid userId', 400);
     else if (!rollieBreed) throw new BasicError('Missing rollieBreed', 400);
-    else if (typeof rollieBreed !== 'number' || !inRange(rollieBreed, 1, 2)) throw new BasicError('Invalid rollieBreed', 400);
+    else if (typeof rollieBreed !== 'number' || !inRange(rollieBreed, 1, 6)) throw new BasicError('Invalid rollieBreed', 400);
 
     const breed = initialRollieBreeds[rollieBreed - 1];
     const claimResult = await dbUsers.updateOne(

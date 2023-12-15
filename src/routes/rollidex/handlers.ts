@@ -44,7 +44,7 @@ function checkForNewRollies(user: RolltopiaUser, balance: AssetCounts) {
 }
 */
 
-export const rolliesSlotId = "651edf58aa4c0d48a4fe2c2c";
+export const rolliesSlotId = "6579e82478a838b7d5943285";
 const defaultGetUserRollieAssetsProps = { slotId: rolliesSlotId, countsOnly: true };
 
 async function checkUserRollidex(data: AssetCounts, headers?: BasicObject<string>) {
