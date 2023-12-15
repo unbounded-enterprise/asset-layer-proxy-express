@@ -153,7 +153,7 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     const multiplier = calculateRewardMultiplier(dbPlay.level, completed);
     const coinsLimit = getCoinLimit(dbPlay.serverStartedAt, coinsEarned, dbLimiter);
     const coinsBase = coinsLimit || coinsEarned;
-    const rewardAmount = Math.round(((completed) ? coinsBase + 50 : coinsBase) * multiplier);
+    const rewardAmount = Math.round(((completed) ? coinsBase + 75 : coinsBase) * multiplier);
     const isNewLevel = ((completed && dbPlay.level <= 100 && dbUser) && (!dbUser.achievements["Rollie Jump Levels"] || dbUser.achievements["Rollie Jump Levels"].value < dbPlay.level));
     
     const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
