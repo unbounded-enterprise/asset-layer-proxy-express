@@ -11,13 +11,13 @@ import { parseBasicError } from "../../utils/basic-error";
 import { incrementAchievementProgress } from "../achievements/handlers";
 
 export const rolltopiaAppId = process.env.ASSETLAYER_APP_ID!;
-const initialRollieBreeds = ["657a508678a838b7d59515e5", "657a510478a838b7d59517aa", "657a518478a838b7d59519b9", "657a520878a838b7d5951b2e", "657a528478a838b7d5951d55", "657a530578a838b7d595235a"] // rollieBreeds.common
+const initialRollieBreeds = ["65806203bd64fb3b7fbf56fe", "65806358bd64fb3b7fbf5adf", "658063f8bd64fb3b7fbf5d6c", "65806473bd64fb3b7fbf5f74", "658064ecbd64fb3b7fbf6190", "65806555bd64fb3b7fbf6613"] // rollieBreeds.common
 const rollieBreeds = {
-  common: ["657a508678a838b7d59515e5", "657a510478a838b7d59517aa", "657a518478a838b7d59519b9", "657a520878a838b7d5951b2e", "657a528478a838b7d5951d55", "657a530578a838b7d595235a"],
-  uncommon: ["657a4d6e78a838b7d59503a6", "657a4e2778a838b7d59506f1", "657a4ea178a838b7d5950d5c", "657a4f1178a838b7d59510bd", "657a4f8278a838b7d595129f"],
-  rare: ["657a487178a838b7d594eb50", "657a495f78a838b7d594f359", "657a49cd78a838b7d594f596", "657a4a7478a838b7d594f73f", "657a4b0178a838b7d594f8b4"],
-  epic: ["657a356278a838b7d594d0fd", "657a362f78a838b7d594d27b", "657a36cf78a838b7d594d40d", "657a377c78a838b7d594d582", "657a382178a838b7d594d815"],
-  legendary: ["657a222e78a838b7d594acb3", "657a311378a838b7d594ca8a", "657a31d278a838b7d594cc99", "657a32da78a838b7d594ce14"],
+  common: ["65806203bd64fb3b7fbf56fe", "65806358bd64fb3b7fbf5adf", "658063f8bd64fb3b7fbf5d6c", "65806473bd64fb3b7fbf5f74", "658064ecbd64fb3b7fbf6190", "65806555bd64fb3b7fbf6613"],
+  uncommon: ["658065d1bd64fb3b7fbf6aa2", "65806675bd64fb3b7fbf6deb", "658066e2bd64fb3b7fbf6ff0", "65806760bd64fb3b7fbf71f5", "658067c8bd64fb3b7fbf73fa"],
+  rare: ["6580683dbd64fb3b7fbf75ff", "658068a2bd64fb3b7fbf7804", "6580691bbd64fb3b7fbf7a15", "658069a7bd64fb3b7fbf7c1a", "65806a2bbd64fb3b7fbf7e1f"],
+  epic: ["65806a9ebd64fb3b7fbf8024", "65806b50bd64fb3b7fbf8229", "65806be2bd64fb3b7fbf8431", "65806c50bd64fb3b7fbf8636", "65806cf4bd64fb3b7fbf87ae"],
+  legendary: ["65806e6abd64fb3b7fbf8ded", "65806f33bd64fb3b7fbf9081", "658070d6bd64fb3b7fbf9a03", "65807180bd64fb3b7fbf9cd9"],
 };
 const breedRarities = [
   [[90,9,1,0,0],[45,45,9,1,0],[4.5,90,4.5,1,0],[5,45,45,5,0],[.5,4.5,90,4.5,.5]],
