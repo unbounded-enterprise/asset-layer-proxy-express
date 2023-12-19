@@ -6,8 +6,19 @@ import { ObjectId } from "mongodb";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 import { DBPlayHelix, generateLevelPropsHelix, handleLevelEndHelix } from "../../utils/game-logic-helix";
 import { RolltopiaUser } from "../users/handlers";
+import { rolltopiaAppId } from "../rollies/handlers";
+import { BasicObject } from "@assetlayer/sdk";
 
 export const rolltopiaCurrencyId = "6579e87778a838b7d59433fc";
+
+async function increaseBalanceWithZeroHandling(amount: number, headers: BasicObject<string>) {
+  if (amount === 0) {
+    const balance = await assetlayer.currencies.getCurrencyBalance({ appId: rolltopiaAppId }, headers);
+    return balance.find(c => c.currencyId === rolltopiaCurrencyId)?.balance || 0;
+  }
+
+  return await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount }, headers);
+}
     
 export type StartLevelProps = { 
   userId: string; // ObjectId used to save play
@@ -58,7 +69,7 @@ export const end = async (req: EndLevelRequest, res: CustomResponse, next: NextF
     else if (dbPlay.playId.toString() !== playId) throw new BasicError('Play ID mismatch', 400);
 
     const rewardAmount = await handleLevelEnd({ coins, completed, endedAt }, dbPlay);
-    const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
+    const balance = await increaseBalanceWithZeroHandling(rewardAmount, headers!);
     const isNewLevel = ((completed && dbPlay.level <= 100 && dbUser) && (!dbUser.achievements["Runway Roller Levels"] || dbUser.achievements["Runway Roller Levels"].value < dbPlay.level));
 
     await Promise.all([
@@ -156,7 +167,7 @@ export const endHelix = async (req: EndLevelRequest, res: CustomResponse, next: 
     const rewardAmount = Math.round(((completed) ? coinsBase + 75 : coinsBase) * multiplier);
     const isNewLevel = ((completed && dbPlay.level <= 100 && dbUser) && (!dbUser.achievements["Rollie Jump Levels"] || dbUser.achievements["Rollie Jump Levels"].value < dbPlay.level));
     
-    const balance = await assetlayer.currencies.increaseCurrencyBalance({ currencyId: rolltopiaCurrencyId, amount: rewardAmount }, headers);
+    const balance = await increaseBalanceWithZeroHandling(rewardAmount, headers!);
     const updatedLimiter = { lastPlays: dbLimiter?.lastPlays || [] };
     if (updatedLimiter.lastPlays.length >= 10) updatedLimiter.lastPlays.shift();
     updatedLimiter.lastPlays.push({ start: dbPlay.serverStartedAt, earned: coinsEarned });
