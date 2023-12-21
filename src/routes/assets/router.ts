@@ -14,14 +14,14 @@ assetsRouter.get('/history', getAssetHistory);
 assetsRouter.get('/marketHistory', getAssetMarketHistory);
 assetsRouter.get('/ownershipHistory', getAssetOwnershipHistory);
 
-assetsRouter.post('/mint', mintAssets);
-assetsRouter.post('/send', send);
-assetsRouter.post('/sendLowest', sendLowestAsset);
-assetsRouter.post('/sendRandom', sendRandomAsset);
+// assetsRouter.post('/mint', mintAssets);
+// assetsRouter.post('/send', send);
+// assetsRouter.post('/sendLowest', sendLowestAsset);
+// assetsRouter.post('/sendRandom', sendRandomAsset);
 
-assetsRouter.put('/update', update);
+// assetsRouter.put('/update', update);
 
-assetsRouter.post('/expressionValues', updateExpressionValues);
-assetsRouter.post('/expressionValuesBulk', updateBulkExpressionValues);
+// assetsRouter.post('/expressionValues', updateExpressionValues);
+// assetsRouter.post('/expressionValuesBulk', updateBulkExpressionValues);
 
 export default assetsRouter;
