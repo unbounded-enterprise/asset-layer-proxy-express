@@ -15,7 +15,7 @@ slotsRouter.get('/collections', collections);
 
 slotsRouter.get('/expressions/types', getExpressionTypes);
 slotsRouter.get('/expressions', getSlotExpressions);
-slotsRouter.post('/expressions/new', createExpression);
-slotsRouter.put('/expressions/update', updateExpression);
+// slotsRouter.post('/expressions/new', createExpression);
+// slotsRouter.put('/expressions/update', updateExpression);
 
 export default slotsRouter;
