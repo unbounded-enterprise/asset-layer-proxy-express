@@ -35,11 +35,16 @@ function errorHandler(e: unknown, req: Request, res: Response, next: NextFunctio
   const statusCode = error.status || 500;
   const message = error.message || 'Request Failed';
   
+  console.error('Error Handler:', error);
+
   return res.status(error.status).json({ statusCode, success: false, message });
 }
 
-app.use(express.json());
 app.use((req, res, next) => {
+  if (process.env.NODE_ENV !== 'local' && req.header('x-forwarded-proto') !== 'https') {
+    return res.redirect(`https://${req.header('host')}${req.url}`);
+  }
+
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, didtoken');
@@ -48,6 +53,7 @@ app.use((req, res, next) => {
 
   next();
 });
+app.use(express.json());
 app.use(`${apiRoute}/app`, appsRouter);
 app.use(`${apiRoute}/asset`, assetsRouter);
 app.use(`${apiRoute}/collection`, collectionsRouter);
