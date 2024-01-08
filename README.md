@@ -2,6 +2,9 @@
 
 ```sh
 $ npm install
+```
+
+```sh
 $ npm install -g ts-node
 ```
 
@@ -43,6 +46,9 @@ As an alternative to forking the repo, you can merge from a remote:
 
 ```sh
 $ git remote add asset-layer-proxy-express https://github.com/unbounded-enterprise/asset-layer-proxy-express.git
+```
+
+```sh
 $ git fetch asset-layer-proxy-express
 ```
 
