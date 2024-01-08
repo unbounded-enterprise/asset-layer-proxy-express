@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { app, buyListing, collection, info, newListing, removeListing, updateListing, user } from './handlers';
+import { app, collection, info, user } from './handlers';
 
 const listingsRouter: Router = Router();
 
@@ -8,11 +8,11 @@ listingsRouter.get('/user', user);
 listingsRouter.get('/collection', collection);
 listingsRouter.get('/app', app);
 
-listingsRouter.post('/new', newListing);
-listingsRouter.post('/buy', buyListing);
+// listingsRouter.post('/new', newListing);
+// listingsRouter.post('/buy', buyListing);
 
-listingsRouter.put('/update', updateListing);
+// listingsRouter.put('/update', updateListing);
 
-listingsRouter.delete('/', removeListing);
+// listingsRouter.delete('/', removeListing);
 
 export default listingsRouter;

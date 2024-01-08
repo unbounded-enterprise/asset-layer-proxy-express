@@ -61,6 +61,7 @@ export const app = async (req: ListingAppRequest, res: CustomResponse, next: Nex
   }
 }
 
+/*
 type ListingNewRequest = Request<{},{},ListingNewProps,ListingNewProps>;
 export const newListing = async (req: ListingNewRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -122,3 +123,4 @@ export const removeListing = async (req: RemoveListingRequest, res: CustomRespon
     return next(e);
   }
 }
+*/

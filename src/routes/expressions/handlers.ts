@@ -28,6 +28,7 @@ export const getSlotExpressions = async (req: GetSlotExpressionsRequest, res: Cu
   }
 }
 
+/*
 type CreateExpressionRequest = Request<{},{},CreateExpressionProps,CreateExpressionProps>;
 export const createExpression = async (req: CreateExpressionRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -85,3 +86,4 @@ export const updateBulkExpressionValues = async (req: UpdateBulkExpressionValues
     return next(e);
   }
 }
+*/

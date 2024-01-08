@@ -41,6 +41,7 @@ export const getCurrencySummary = async (req: GetCurrencySummaryRequest, res: Cu
   }
 }
 
+/*
 type IncreaseCurrencyBalanceRequest = Request<{},{},IncreaseCurrencyBalanceProps,IncreaseCurrencyBalanceProps>;
 export const increaseCurrencyBalance = async (req: IncreaseCurrencyBalanceRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -79,3 +80,4 @@ export const transferCurrency = async (req: TransferCurrencyRequest, res: Custom
     return next(e);
   }
 }
+*/

@@ -141,6 +141,7 @@ export const getAssetOwnershipHistory = async (req: GetAssetOwnershipHistoryRequ
   }
 }
 
+/*
 type MintAssetsRequest = Request<{},{},MintAssetsProps,MintAssetsProps>;
 export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -219,3 +220,4 @@ export const update = async (req: AssetUpdateRequest, res: CustomResponse, next:
     return next(e);
   }
 }
+*/

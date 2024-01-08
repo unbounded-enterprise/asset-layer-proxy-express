@@ -34,6 +34,7 @@ export const assets = async (req: CollectionAssetsRequest, res: CustomResponse, 
   }
 }
 
+/*
 type CreateCollectionRequest = Request<{},{},CreateCollectionProps,CreateCollectionProps>;
 export const createCollection = async (req: CreateCollectionRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -109,3 +110,4 @@ export const updateCollectionImage = async (req: UpdateCollectionImageRequest, r
     return next(e);
   }
 }
+*/
