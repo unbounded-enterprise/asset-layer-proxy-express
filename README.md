@@ -36,3 +36,24 @@ $ npm run build
 The routes in the proxy mirror the structure in the Asset Layer API.
 
 See more: (docs)
+
+## Adding as a remote to your project
+
+As an alternative to forking the repo, you can merge from a remote:
+
+```sh
+$ git remote add asset-layer-proxy-express https://github.com/unbounded-enterprise/asset-layer-proxy-express.git
+$ git fetch asset-layer-proxy-express
+```
+
+Now in your editor, confirm you're on the branch you want to merge into, then:
+
+```sh
+$ git merge asset-layer-proxy-express/main
+```
+
+Finally, push the merge commit to your repo, IE:
+
+```sh
+$ git push -u origin main
+```
