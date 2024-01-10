@@ -17,6 +17,7 @@ export const getUser = async (req: GetUserRequest, res: CustomResponse, next: Ne
   }
 }
 
+/*
 type RegisterUserRequest = Request<{},{},RegisterUserProps,{}>;
 export const registerUser = async (req: RegisterUserRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -31,3 +32,4 @@ export const registerUser = async (req: RegisterUserRequest, res: CustomResponse
     return next(e);
   }
 }
+*/
