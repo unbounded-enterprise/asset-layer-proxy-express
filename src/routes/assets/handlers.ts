@@ -142,11 +142,11 @@ export const getAssetOwnershipHistory = async (req: GetAssetOwnershipHistoryRequ
 }
 
 /*
-type MintAssetsRequest = Request<{},{},MintAssetsProps,MintAssetsProps>;
+type MintAssetsRequest = Request<{},{},MintAssetsProps>;
 export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { collectionId, number, mintTo, walletUserId } = { ...req.body, ...req.query };
+    const { collectionId, number, mintTo, walletUserId } = req.body;
 
     const response = await assetlayer.assets.raw.mint({ collectionId, number, mintTo, walletUserId }, headers);
 
@@ -157,11 +157,11 @@ export const mintAssets = async (req: MintAssetsRequest, res: CustomResponse, ne
   }
 }
 
-type AssetSendRequest = Request<{},{},AssetSendProps,AssetSendProps>;
+type AssetSendRequest = Request<{},{},AssetSendProps>;
 export const send = async (req: AssetSendRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { receiver, walletUserId, assetId, assetIds, collectionId } = { ...req.body, ...req.query };
+    const { receiver, walletUserId, assetId, assetIds, collectionId } = req.body;
 
     if (!(assetId || assetIds || collectionId)) throw new Error('Missing assetId(s) or collectionId');
 
@@ -174,11 +174,11 @@ export const send = async (req: AssetSendRequest, res: CustomResponse, next: Nex
   }
 }
 
-type SendLowestAssetRequest = Request<{},{},SendCollectionAssetsProps,SendCollectionAssetsProps>;
+type SendLowestAssetRequest = Request<{},{},SendCollectionAssetsProps>;
 export const sendLowestAsset = async (req: SendLowestAssetRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { receiver, collectionId, walletUserId } = { ...req.body, ...req.query };
+    const { receiver, collectionId, walletUserId } = req.body;
 
     const response = await assetlayer.assets.raw.sendLowestAsset({ receiver, collectionId, walletUserId }, headers);
 
@@ -189,11 +189,11 @@ export const sendLowestAsset = async (req: SendLowestAssetRequest, res: CustomRe
   }
 }
 
-type SendRandomAssetRequest = Request<{},{},SendCollectionAssetsProps,SendCollectionAssetsProps>;
+type SendRandomAssetRequest = Request<{},{},SendCollectionAssetsProps>;
 export const sendRandomAsset = async (req: SendRandomAssetRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { receiver, collectionId, walletUserId } = { ...req.body, ...req.query };
+    const { receiver, collectionId, walletUserId } = req.body;
 
     const response = await assetlayer.assets.raw.sendRandomAsset({ receiver, collectionId, walletUserId }, headers);
 
@@ -204,11 +204,11 @@ export const sendRandomAsset = async (req: SendRandomAssetRequest, res: CustomRe
   }
 }
 
-type AssetUpdateRequest = Request<{},{},AssetUpdateProps,AssetUpdateProps>;
+type AssetUpdateRequest = Request<{},{},AssetUpdateProps>;
 export const update = async (req: AssetUpdateRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { properties, assetId, assetIds, collectionId } = { ...req.body, ...req.query };
+    const { properties, assetId, assetIds, collectionId } = req.body;
     
     if (!(assetId || assetIds || collectionId)) throw new Error('Missing assetId(s) or collectionId');
 
