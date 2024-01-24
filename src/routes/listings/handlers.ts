@@ -61,11 +61,11 @@ export const app = async (req: ListingAppRequest, res: CustomResponse, next: Nex
   }
 }
 
-type ListingNewRequest = Request<{},{},ListingNewProps,ListingNewProps>;
+type ListingNewRequest = Request<{},{},ListingNewProps>;
 export const newListing = async (req: ListingNewRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { price, currency, currencyId, assetId, assetIds, collectionId, liveTime, status, walletUserId } = { ...req.body, ...req.query };
+    const { price, currency, currencyId, assetId, assetIds, collectionId, liveTime, status, walletUserId } = req.body;
 
     if (!(assetId || assetIds || collectionId)) throw new Error('Must provide either assetId, assetIds, or collectionId');
 
@@ -78,11 +78,11 @@ export const newListing = async (req: ListingNewRequest, res: CustomResponse, ne
   }
 }
 
-type BuyListingRequest = Request<{},{},BuyListingProps,BuyListingProps>;
+type BuyListingRequest = Request<{},{},BuyListingProps>;
 export const buyListing = async (req: BuyListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { listingId, price, currency, currencyId } = { ...req.body, ...req.query };
+    const { listingId, price, currency, currencyId } = req.body;
 
     const response = await assetlayer.listings.raw.buyListing({ listingId, price, currency, currencyId }, headers);
 
@@ -93,11 +93,11 @@ export const buyListing = async (req: BuyListingRequest, res: CustomResponse, ne
   }
 }
 
-type UpdateListingRequest = Request<{},{},UpdateListingProps,UpdateListingProps>;
+type UpdateListingRequest = Request<{},{},UpdateListingProps>;
 export const updateListing = async (req: UpdateListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { listingId, price, currency, currencyId, liveTime, status, walletUserId } = { ...req.body, ...req.query };
+    const { listingId, price, currency, currencyId, liveTime, status, walletUserId } = req.body;
 
     const response = await assetlayer.listings.raw.updateListing({ listingId, price, currency, currencyId, liveTime, status, walletUserId }, headers);
 
@@ -108,11 +108,11 @@ export const updateListing = async (req: UpdateListingRequest, res: CustomRespon
   }
 }
 
-type RemoveListingRequest = Request<{},{},RemoveListingProps,RemoveListingProps>;
+type RemoveListingRequest = Request<{},{},RemoveListingProps>;
 export const removeListing = async (req: RemoveListingRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { listingId, walletUserId } = { ...req.body, ...req.query };
+    const { listingId, walletUserId } = req.body;
 
     const response = await assetlayer.listings.raw.removeListing({ listingId, walletUserId }, headers);
 

@@ -41,11 +41,11 @@ export const getCurrencySummary = async (req: GetCurrencySummaryRequest, res: Cu
   }
 }
 
-type IncreaseCurrencyBalanceRequest = Request<{},{},IncreaseCurrencyBalanceProps,IncreaseCurrencyBalanceProps>;
+type IncreaseCurrencyBalanceRequest = Request<{},{},IncreaseCurrencyBalanceProps>;
 export const increaseCurrencyBalance = async (req: IncreaseCurrencyBalanceRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const response = await assetlayer.currencies.raw.increaseCurrencyBalance({ ...req.body, ...req.query }, headers);
+    const response = await assetlayer.currencies.raw.increaseCurrencyBalance(req.body, headers);
 
     return res.json(response);
   }
@@ -54,11 +54,11 @@ export const increaseCurrencyBalance = async (req: IncreaseCurrencyBalanceReques
   }
 }
 
-type DecreaseCurrencyBalanceRequest = Request<{},{},DecreaseCurrencyBalanceProps,DecreaseCurrencyBalanceProps>;
+type DecreaseCurrencyBalanceRequest = Request<{},{},DecreaseCurrencyBalanceProps>;
 export const decreaseCurrencyBalance = async (req: DecreaseCurrencyBalanceRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const response = await assetlayer.currencies.raw.decreaseCurrencyBalance({ ...req.body, ...req.query }, headers);
+    const response = await assetlayer.currencies.raw.decreaseCurrencyBalance(req.body, headers);
 
     return res.json(response);
   }
@@ -67,11 +67,11 @@ export const decreaseCurrencyBalance = async (req: DecreaseCurrencyBalanceReques
   }
 }
 
-type TransferCurrencyRequest = Request<{},{},TransferCurrencyProps,TransferCurrencyProps>;
+type TransferCurrencyRequest = Request<{},{},TransferCurrencyProps>;
 export const transferCurrency = async (req: TransferCurrencyRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const response = await assetlayer.currencies.raw.transferCurrency({ ...req.body, ...req.query }, headers);
+    const response = await assetlayer.currencies.raw.transferCurrency(req.body, headers);
 
     return res.json(response);
   }

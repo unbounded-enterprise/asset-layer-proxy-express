@@ -28,10 +28,10 @@ export const getSlotExpressions = async (req: GetSlotExpressionsRequest, res: Cu
   }
 }
 
-type CreateExpressionRequest = Request<{},{},CreateExpressionProps,CreateExpressionProps>;
+type CreateExpressionRequest = Request<{},{},CreateExpressionProps>;
 export const createExpression = async (req: CreateExpressionRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { slotId, expressionTypeId, expressionName, description } = { ...req.body, ...req.query };
+    const { slotId, expressionTypeId, expressionName, description } = req.body;
 
     const response = await assetlayer.expressions.raw.createExpression({ slotId, expressionTypeId, expressionName, description });
 
@@ -42,10 +42,10 @@ export const createExpression = async (req: CreateExpressionRequest, res: Custom
   }
 }
 
-type UpdateExpressionRequest = Request<{},{},UpdateExpressionProps,UpdateExpressionProps>;
+type UpdateExpressionRequest = Request<{},{},UpdateExpressionProps>;
 export const updateExpression = async (req: UpdateExpressionRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { expressionId, expressionTypeId, expressionName, description } = { ...req.body, ...req.query };
+    const { expressionId, expressionTypeId, expressionName, description } = req.body;
 
     const response = await assetlayer.expressions.raw.updateExpression({ expressionId, expressionTypeId, expressionName, description });
 
@@ -56,10 +56,10 @@ export const updateExpression = async (req: UpdateExpressionRequest, res: Custom
   }
 }
 
-type UpdateExpressionValuesRequest = Request<{},{},UpdateExpressionValuesProps,UpdateExpressionValuesProps>;
+type UpdateExpressionValuesRequest = Request<{},{},UpdateExpressionValuesProps>;
 export const updateExpressionValues = async (req: UpdateExpressionValuesRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { expressionAttributeName, value, expressionId, expressionName, assetId, assetIds, collectionId } = { ...req.body, ...req.query };
+    const { expressionAttributeName, value, expressionId, expressionName, assetId, assetIds, collectionId } = req.body;
 
     if (!(assetId || assetIds || collectionId)) throw new Error('Missing assetId(s) or collectionId');
 
@@ -72,10 +72,10 @@ export const updateExpressionValues = async (req: UpdateExpressionValuesRequest,
   }
 }
 
-type UpdateBulkExpressionValuesRequest = Request<{},{},UpdateBulkExpressionValuesProps,UpdateBulkExpressionValuesProps>;
+type UpdateBulkExpressionValuesRequest = Request<{},{},UpdateBulkExpressionValuesProps>;
 export const updateBulkExpressionValues = async (req: UpdateBulkExpressionValuesRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { collectionId, value } = { ...req.body, ...req.query };
+    const { collectionId, value } = req.body;
 
     const response = await assetlayer.expressions.raw.updateBulkExpressionValues({ collectionId, value });
 

@@ -34,12 +34,14 @@ export const assets = async (req: CollectionAssetsRequest, res: CustomResponse, 
   }
 }
 
-type CreateCollectionRequest = Request<{},{},CreateCollectionProps,CreateCollectionProps>;
+type CreateCollectionRequest = Request<{},{},CreateCollectionProps>;
 export const createCollection = async (req: CreateCollectionRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const { collectionName, slotId, type, maximum, description, tags, royaltyRecipient, 
-      collectionImage, collectionBanner, properties, walletUserId } = { ...req.body, ...req.query };
+    const {
+      collectionName, slotId, type, maximum, description, tags, royaltyRecipient, 
+      collectionImage, collectionBanner, properties, walletUserId
+    } = req.body;
 
     const response = await assetlayer.collections.raw.createCollection({ 
       collectionName, slotId, type, maximum, description, tags, royaltyRecipient, 
@@ -53,10 +55,10 @@ export const createCollection = async (req: CreateCollectionRequest, res: Custom
   }
 }
 
-type UpdateCollectionRequest = Request<{},{},UpdateCollectionProps,UpdateCollectionProps>;
+type UpdateCollectionRequest = Request<{},{},UpdateCollectionProps>;
 export const updateCollection = async (req: UpdateCollectionRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { collectionId, description, tags, royaltyRecipient, collectionImage, collectionBanner, properties } = { ...req.body, ...req.query };
+    const { collectionId, description, tags, royaltyRecipient, collectionImage, collectionBanner, properties } = req.body;
 
     const response = await assetlayer.collections.raw.updateCollection({ 
       collectionId, description, tags, royaltyRecipient, collectionImage, collectionBanner, properties 
@@ -69,10 +71,10 @@ export const updateCollection = async (req: UpdateCollectionRequest, res: Custom
   }
 }
 
-type ActivateCollectionRequest = Request<{},{},ActivateCollectionProps,ActivateCollectionProps>;
+type ActivateCollectionRequest = Request<{},{},ActivateCollectionProps>;
 export const activateCollection = async (req: ActivateCollectionRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const collectionId = req.query.collectionId || req.body.collectionId;
+    const collectionId = req.body.collectionId;
 
     const response = await assetlayer.collections.raw.activateCollection({ collectionId });
 
@@ -85,7 +87,7 @@ export const activateCollection = async (req: ActivateCollectionRequest, res: Cu
 
 export const deactivateCollection = async (req: ActivateCollectionRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const collectionId = req.query.collectionId || req.body.collectionId;
+    const collectionId = req.body.collectionId;
 
     const response = await assetlayer.collections.raw.deactivateCollection({ collectionId });
 
@@ -96,10 +98,10 @@ export const deactivateCollection = async (req: ActivateCollectionRequest, res: 
   }
 }
 
-type UpdateCollectionImageRequest = Request<{},{},UpdateCollectionImageProps,UpdateCollectionImageProps>;
+type UpdateCollectionImageRequest = Request<{},{},UpdateCollectionImageProps>;
 export const updateCollectionImage = async (req: UpdateCollectionImageRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { collectionId, value } = { ...req.body, ...req.query };
+    const { collectionId, value } = req.body;
 
     const response = await assetlayer.collections.raw.updateCollectionImage({ collectionId, value });
 
