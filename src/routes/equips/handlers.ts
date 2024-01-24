@@ -17,11 +17,11 @@ export const getEquips = async (req: GetEquipRequest, res: CustomResponse, next:
   }
 }
 
-type SetEquipRequest = Request<{},{},SetEquipProps,SetEquipProps>;
+type SetEquipRequest = Request<{},{},SetEquipProps>;
 export const setEquip = async (req: SetEquipRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const response = await assetlayer.equips.raw.setEquip({ ...req.body, ...req.query }, headers);
+    const response = await assetlayer.equips.raw.setEquip(req.body, headers);
 
     return res.json(response);
   }
@@ -30,11 +30,11 @@ export const setEquip = async (req: SetEquipRequest, res: CustomResponse, next: 
   }
 }
 
-type RemoveEquipRequest = Request<{},{},RemoveEquipProps,RemoveEquipProps>;
+type RemoveEquipRequest = Request<{},{},RemoveEquipProps>;
 export const removeEquip = async (req: RemoveEquipRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const response = await assetlayer.equips.raw.removeEquip({ ...req.body, ...req.query }, headers);
+    const response = await assetlayer.equips.raw.removeEquip(req.body, headers);
 
     return res.json(response);
   }

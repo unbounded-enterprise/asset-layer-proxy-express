@@ -5,11 +5,11 @@ import { BuyItemProps, NewItemProps, RemoveItemProps } from "@assetlayer/sdk";
 import { formatIncomingHeaders } from "../../utils/basic-format";
 
 /*
-type NewItemRequest = Request<{},{},NewItemProps,NewItemProps>;
+type NewItemRequest = Request<{},{},NewItemProps>;
 export const newItem = async (req: NewItemRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const response = await assetlayer.shop.raw.newItem({ ...req.body, ...req.query }, headers);
+    const response = await assetlayer.shop.raw.newItem(req.body, headers);
 
     return res.json(response);
   }
@@ -19,11 +19,11 @@ export const newItem = async (req: NewItemRequest, res: CustomResponse, next: Ne
 }
 */
 
-type BuyItemRequest = Request<{},{},BuyItemProps,BuyItemProps>;
+type BuyItemRequest = Request<{},{},BuyItemProps>;
 export const buyItem = async (req: BuyItemRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const response = await assetlayer.shop.raw.buyItem({ ...req.body, ...req.query }, headers);
+    const response = await assetlayer.shop.raw.buyItem(req.body, headers);
 
     return res.json(response);
   }
@@ -45,11 +45,11 @@ export const shopSummary = async (req: ShopSummaryRequest, res: CustomResponse, 
 }
 
 /*
-type RemoveItemRequest = Request<{},{},RemoveItemProps,RemoveItemProps>;
+type RemoveItemRequest = Request<{},{},RemoveItemProps>;
 export const removeItem = async (req: RemoveItemRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
-    const response = await assetlayer.shop.raw.removeItem({ ...req.body, ...req.query }, headers);
+    const response = await assetlayer.shop.raw.removeItem(req.body, headers);
 
     return res.json(response);
   }

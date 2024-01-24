@@ -17,7 +17,7 @@ export const getUser = async (req: GetUserRequest, res: CustomResponse, next: Ne
   }
 }
 
-type RegisterUserRequest = Request<{},{},RegisterUserProps,{}>;
+type RegisterUserRequest = Request<{},{},RegisterUserProps>;
 export const registerUser = async (req: RegisterUserRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const headers = formatIncomingHeaders(req.headers);
