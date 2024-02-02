@@ -20,9 +20,9 @@ export const getSlot = async (req: GetSlotRequest, res: CustomResponse, next: Ne
 type SlotCollectionsRequest = Request<{},{},SlotCollectionsProps,SlotCollectionsProps>;
 export const collections = async (req: SlotCollectionsRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { slotId, idOnly, includeDeactivated } = { ...req.body, ...req.query };
+    const { slotId, idOnly, includeDeactivated, includeDrafts, includeSubmissionData } = { ...req.body, ...req.query };
 
-    const response = await assetlayer.slots.raw.collections({ slotId, idOnly, includeDeactivated });
+    const response = await assetlayer.slots.raw.collections({ slotId, idOnly, includeDeactivated, includeDrafts, includeSubmissionData });
 
     return res.json(response);
   }

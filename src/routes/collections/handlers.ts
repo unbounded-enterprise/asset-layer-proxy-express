@@ -7,11 +7,11 @@ import { formatIncomingHeaders } from "../../utils/basic-format";
 type CollectionInfoRequest = Request<{},{},CollectionInfoProps,CollectionInfoProps>;
 export const info = async (req: CollectionInfoRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { collectionId, collectionIds } = { ...req.body, ...req.query };
+    const { collectionId, collectionIds, includeSubmissionData } = { ...req.body, ...req.query };
 
     if (!(collectionId || collectionIds)) throw new Error('Missing collectionId(s)');
 
-    const response = await assetlayer.collections.raw.info({ collectionId, collectionIds });
+    const response = await assetlayer.collections.raw.info({ collectionId, collectionIds, includeSubmissionData });
 
     return res.json(response);
   }
@@ -41,12 +41,12 @@ export const createCollection = async (req: CreateCollectionRequest, res: Custom
     const headers = formatIncomingHeaders(req.headers);
     const {
       collectionName, slotId, type, maximum, description, tags, royaltyRecipient, 
-      collectionImage, collectionBanner, properties, walletUserId
+      collectionImage, collectionBanner, properties, walletUserId, defaultProperties, draft
     } = req.body;
 
     const response = await assetlayer.collections.raw.createCollection({ 
       collectionName, slotId, type, maximum, description, tags, royaltyRecipient, 
-      collectionImage, collectionBanner, properties, walletUserId
+      collectionImage, collectionBanner, properties, walletUserId, defaultProperties, draft
     }, headers);
 
     return res.json(response);
@@ -59,10 +59,14 @@ export const createCollection = async (req: CreateCollectionRequest, res: Custom
 type UpdateCollectionRequest = Request<{},{},UpdateCollectionProps>;
 export const updateCollection = async (req: UpdateCollectionRequest, res: CustomResponse, next: NextFunction) => {
   try {
-    const { collectionId, description, tags, royaltyRecipient, collectionImage, collectionBanner, properties } = req.body;
+    const { 
+      collectionId, collectionName, description, tags, royaltyRecipient, 
+      collectionImage, collectionBanner, properties, defaultProperties 
+    } = req.body;
 
     const response = await assetlayer.collections.raw.updateCollection({ 
-      collectionId, description, tags, royaltyRecipient, collectionImage, collectionBanner, properties 
+      collectionId, collectionName, description, tags, royaltyRecipient, 
+      collectionImage, collectionBanner, properties, defaultProperties
     });
 
     return res.json(response);
