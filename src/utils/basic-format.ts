@@ -1,9 +1,7 @@
 import { BasicObject } from "@assetlayer/sdk";
 import { IncomingHttpHeaders } from "http";
 
-export function formatIncomingHeaders(headers?: IncomingHttpHeaders) {
-    if (!headers) return undefined;
-
+export function formatIncomingHeaders(headers: IncomingHttpHeaders) {
     const head = {} as BasicObject<string>;
     
     if (headers.didtoken) head.didtoken = headers.didtoken as string;
