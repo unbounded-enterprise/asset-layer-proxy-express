@@ -2,7 +2,7 @@ import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { CreateExpressionProps, GetSlotExpressionsProps, UpdateBulkExpressionValuesProps, UpdateExpressionValuesProps, UpdateExpressionProps } from "@assetlayer/sdk/dist/types/expression";
-import { BasicError } from "@assetlayer/sdk/dist/types/basic-types";
+import { BasicError } from "@assetlayer/sdk";
 
 export const getExpressionTypes = async (req: Request, res: CustomResponse, next: NextFunction) => {
   try {

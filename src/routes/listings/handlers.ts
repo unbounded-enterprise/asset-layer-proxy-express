@@ -3,7 +3,7 @@ import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { BuyListingProps, GetAppListingsProps, GetCollectionListingsProps, GetListingProps, GetUserListingsProps, ListingAppProps, ListingCollectionProps, ListingNewProps, ListingUserProps, RemoveListingProps, UpdateListingProps } from "@assetlayer/sdk/dist/types/listing";
 import { formatIncomingHeaders } from "../../utils/basic-format";
-import { BasicError } from "@assetlayer/sdk/dist/types/basic-types";
+import { BasicError } from "@assetlayer/sdk";
 
 type ListingInfoRequest = Request<{},{},GetListingProps,GetListingProps>;
 export const info = async (req: ListingInfoRequest, res: CustomResponse, next: NextFunction) => {
