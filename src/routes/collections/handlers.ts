@@ -3,13 +3,14 @@ import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { ActivateCollectionProps, CollectionAssetsProps, CollectionInfoProps, CreateCollectionProps, GetCollectionAssetsProps, UpdateCollectionImageProps, UpdateCollectionProps } from "@assetlayer/sdk/dist/types/collection";
 import { formatIncomingHeaders } from "../../utils/basic-format";
+import { BasicError } from "@assetlayer/sdk/dist/types/basic-types";
 
 type CollectionInfoRequest = Request<{},{},CollectionInfoProps,CollectionInfoProps>;
 export const info = async (req: CollectionInfoRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const { collectionId, collectionIds, includeSubmissionData } = { ...req.body, ...req.query };
 
-    if (!(collectionId || collectionIds)) throw new Error('Missing collectionId(s)');
+    if (!(collectionId || collectionIds)) throw new BasicError('Missing collectionId(s)', 400);
 
     const response = await assetlayer.collections.raw.info({ collectionId, collectionIds, includeSubmissionData });
 

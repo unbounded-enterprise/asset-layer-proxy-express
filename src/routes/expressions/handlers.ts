@@ -2,6 +2,7 @@ import { Request, NextFunction } from "express";
 import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { CreateExpressionProps, GetSlotExpressionsProps, UpdateBulkExpressionValuesProps, UpdateExpressionValuesProps, UpdateExpressionProps } from "@assetlayer/sdk/dist/types/expression";
+import { BasicError } from "@assetlayer/sdk/dist/types/basic-types";
 
 export const getExpressionTypes = async (req: Request, res: CustomResponse, next: NextFunction) => {
   try {
@@ -61,7 +62,7 @@ export const updateExpressionValues = async (req: UpdateExpressionValuesRequest,
   try {
     const { expressionAttributeName, value, expressionId, expressionName, assetId, assetIds, collectionId } = req.body;
 
-    if (!(assetId || assetIds || collectionId)) throw new Error('Missing assetId(s) or collectionId');
+    if (!(assetId || assetIds || collectionId)) throw new BasicError('Missing assetId(s) or collectionId', 400);
 
     const result = await assetlayer.expressions.raw.updateExpressionValues({ expressionAttributeName, value, expressionId, expressionName, assetId, assetIds, collectionId });
 
