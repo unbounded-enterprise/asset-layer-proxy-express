@@ -3,7 +3,7 @@ import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { ActivateCollectionProps, CollectionAssetsProps, CollectionInfoProps, CreateCollectionProps, GetCollectionAssetsProps, UpdateCollectionImageProps, UpdateCollectionProps } from "@assetlayer/sdk/dist/types/collection";
 import { formatIncomingHeaders } from "../../utils/basic-format";
-import { BasicError } from "@assetlayer/sdk/dist/types/basic-types";
+import { BasicError } from "@assetlayer/sdk";
 
 type CollectionInfoRequest = Request<{},{},CollectionInfoProps,CollectionInfoProps>;
 export const info = async (req: CollectionInfoRequest, res: CustomResponse, next: NextFunction) => {
