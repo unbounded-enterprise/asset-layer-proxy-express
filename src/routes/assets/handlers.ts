@@ -4,13 +4,14 @@ import { CustomResponse } from "../../types/basic-types";
 import { AssetInfoProps, AssetSendProps, AssetUpdateProps, AssetUserProps, GetAssetHistoryProps, GetAssetOwnershipHistoryProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
 import { IncomingHttpHeaders } from "http";
 import { formatIncomingHeaders } from "../../utils/basic-format";
+import { BasicError } from "@assetlayer/sdk/dist/types/basic-types";
 
 type AssetInfoRequest = Request<{},{},AssetInfoProps,AssetInfoProps>;
 export const info = async (req: AssetInfoRequest, res: CustomResponse, next: NextFunction) => {
   try {
     const { assetId, assetIds } = { ...req.body, ...req.query };
 
-    if (!(assetId || assetIds)) throw new Error('Missing assetId(s)');
+    if (!(assetId || assetIds)) throw new BasicError('Missing assetId(s)', 400);
 
     const response = await assetlayer.assets.raw.info({ assetId, assetIds });
 
@@ -162,7 +163,7 @@ export const send = async (req: AssetSendRequest, res: CustomResponse, next: Nex
     const headers = formatIncomingHeaders(req.headers);
     const { receiver, walletUserId, assetId, assetIds, collectionId } = req.body;
 
-    if (!(assetId || assetIds || collectionId)) throw new Error('Missing assetId(s) or collectionId');
+    if (!(assetId || assetIds || collectionId)) throw new BasicError('Missing assetId(s) or collectionId', 400);
 
     const response = await assetlayer.assets.raw.send({ receiver, walletUserId, assetId, assetIds, collectionId }, headers);
 
@@ -209,7 +210,7 @@ export const update = async (req: AssetUpdateRequest, res: CustomResponse, next:
     const headers = formatIncomingHeaders(req.headers);
     const { properties, assetId, assetIds, collectionId } = req.body;
     
-    if (!(assetId || assetIds || collectionId)) throw new Error('Missing assetId(s) or collectionId');
+    if (!(assetId || assetIds || collectionId)) throw new BasicError('Missing assetId(s) or collectionId', 400);
 
     const response = await assetlayer.assets.raw.update({ properties, assetId, assetIds, collectionId }, headers);
 

@@ -3,6 +3,7 @@ import { assetlayer } from "../../server";
 import { CustomResponse } from "../../types/basic-types";
 import { BuyListingProps, GetAppListingsProps, GetCollectionListingsProps, GetListingProps, GetUserListingsProps, ListingAppProps, ListingCollectionProps, ListingNewProps, ListingUserProps, RemoveListingProps, UpdateListingProps } from "@assetlayer/sdk/dist/types/listing";
 import { formatIncomingHeaders } from "../../utils/basic-format";
+import { BasicError } from "@assetlayer/sdk/dist/types/basic-types";
 
 type ListingInfoRequest = Request<{},{},GetListingProps,GetListingProps>;
 export const info = async (req: ListingInfoRequest, res: CustomResponse, next: NextFunction) => {
@@ -67,7 +68,7 @@ export const newListing = async (req: ListingNewRequest, res: CustomResponse, ne
     const headers = formatIncomingHeaders(req.headers);
     const { price, currency, currencyId, assetId, assetIds, collectionId, liveTime, status, walletUserId } = req.body;
 
-    if (!(assetId || assetIds || collectionId)) throw new Error('Must provide either assetId, assetIds, or collectionId');
+    if (!(assetId || assetIds || collectionId)) throw new BasicError('Must provide either assetId, assetIds, or collectionId', 400);
 
     const response = await assetlayer.listings.raw.new({ price, currency, currencyId, assetId, assetIds, collectionId, liveTime, status, walletUserId }, headers);
 
