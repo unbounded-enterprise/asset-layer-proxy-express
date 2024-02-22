@@ -4,7 +4,7 @@ import { CustomResponse } from "../../types/basic-types";
 import { AssetInfoProps, AssetSendProps, AssetUpdateProps, AssetUserProps, GetAssetHistoryProps, GetAssetOwnershipHistoryProps, GetUserCollectionAssetsProps, GetUserCollectionsAssetsProps, GetUserSlotAssetsProps, GetUserSlotsAssetsProps, MintAssetsProps, SendAssetProps, SendAssetsProps, SendCollectionAssetsProps, UpdateAssetProps, UpdateAssetsProps, UpdateCollectionAssetsProps } from "@assetlayer/sdk/dist/types/asset";
 import { IncomingHttpHeaders } from "http";
 import { formatIncomingHeaders } from "../../utils/basic-format";
-import { BasicError } from "@assetlayer/sdk/dist/types/basic-types";
+import { BasicError } from "@assetlayer/sdk";
 
 type AssetInfoRequest = Request<{},{},AssetInfoProps,AssetInfoProps>;
 export const info = async (req: AssetInfoRequest, res: CustomResponse, next: NextFunction) => {
