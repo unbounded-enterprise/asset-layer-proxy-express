@@ -17,6 +17,7 @@ export const getEquips = async (req: GetEquipRequest, res: CustomResponse, next:
   }
 }
 
+/*
 type SetEquipRequest = Request<{},{},SetEquipProps>;
 export const setEquip = async (req: SetEquipRequest, res: CustomResponse, next: NextFunction) => {
   try {
@@ -42,3 +43,4 @@ export const removeEquip = async (req: RemoveEquipRequest, res: CustomResponse, 
     return next(e);
   }
 }
+*/

@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { getEquips, removeEquip, setEquip } from './handlers';
+import { getEquips } from './handlers';
 
 const equipsRouter: Router = Router();
 
 equipsRouter.get('/info', getEquips);
 
-equipsRouter.post('/new', setEquip);
+// equipsRouter.post('/new', setEquip);
 
-equipsRouter.delete('/', removeEquip);
+// equipsRouter.delete('/', removeEquip);
 
 export default equipsRouter;
