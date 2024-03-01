@@ -41,7 +41,7 @@ function errorHandler(e: unknown, req: Request, res: Response, next: NextFunctio
 }
 
 app.use((req, res, next) => {
-  if (process.env.NODE_ENV !== 'local' && req.header('x-forwarded-proto') !== 'https') {
+  if (process.env.NODE_ENV !== 'local' && !req.secure) {
     return res.redirect(`https://${req.header('host')}${req.url}`);
   }
 
@@ -85,7 +85,9 @@ app.use('/', async (req: any, res: any, next: NextFunction) => {
     return next(e);
   }
 });
-
+app.use((req: Request, res: Response) => {
+  res.status(404).send({ error: 'Route not found' });
+});
 app.use(errorHandler);
 
 /*
