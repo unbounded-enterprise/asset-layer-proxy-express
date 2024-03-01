@@ -41,7 +41,7 @@ function errorHandler(e: unknown, req: Request, res: Response, next: NextFunctio
 }
 
 app.use((req, res, next) => {
-  if (process.env.NODE_ENV !== 'local' && req.header('x-forwarded-proto') !== 'https') {
+  if (process.env.NODE_ENV !== 'local' && !req.secure) {
     return res.redirect(`https://${req.header('host')}${req.url}`);
   }
 
@@ -69,7 +69,8 @@ app.use(`${apiRoute}/slot`, slotsRouter);
 // app.use(`${apiRoute}/stripe`, stripeRouter);
 // app.use(`${apiRoute}/team`, teamRouter);
 app.use(`${apiRoute}/user`, usersRouter);
-app.use('/test', async (req: any, res: any, next: NextFunction) => {
+
+app.get('/test', async (req: any, res: any, next: NextFunction) => {
   try {
     return res.sendFile('test.html', { root: 'src' });
   }
@@ -77,13 +78,17 @@ app.use('/test', async (req: any, res: any, next: NextFunction) => {
     return next(e);
   }
 });
-app.use('/', async (req: any, res: any, next: NextFunction) => {
+app.get('/', async (req: any, res: any, next: NextFunction) => {
   try {
     return res.sendFile('did.html', { root: 'src' });
   }
   catch (e) {
     return next(e);
   }
+});
+
+app.use((req: Request, res: Response) => {
+  res.status(404).send({ error: 'Route not found' });
 });
 
 app.use(errorHandler);
