@@ -41,7 +41,7 @@ function errorHandler(e: unknown, req: Request, res: Response, next: NextFunctio
 }
 
 app.use((req, res, next) => {
-  if (process.env.NODE_ENV !== 'local' && !req.secure) {
+  if (process.env.NODE_ENV !== 'local' && req.header('x-forwarded-proto') !== 'https') {
     return res.redirect(`https://${req.header('host')}${req.url}`);
   }
 
